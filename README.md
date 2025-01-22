@@ -1,8 +1,18 @@
-![Auto Assign](https://github.com/Slinky-Team/demo-repository/actions/workflows/auto-assign.yml/badge.svg)
 
-![Proof HTML](https://github.com/Slinky-Team/demo-repository/actions/workflows/proof-html.yml/badge.svg)
+![Logo](https://res.cloudinary.com/dnalq36cn/image/upload/v1737567747/SLInky_1-0-1_HalfSize_wjjqqz.png)
 
-# Welcome to your organization's demo respository
-This code repository (or "repo") is designed to demonstrate the best GitHub has to offer with the least amount of noise.
 
-The repo includes an `index.html` file (so it can render a web page), two GitHub Actions workflows, and a CSS stylesheet dependency.
+# Security Lookup Interface
+
+A project designed to rebuild the Cox Communications current Security Lookup Interface with integrations with all of its APIs and a completely reworked frontend and backend; Created using the React framework and Python respectively.
+
+
+## Documentation
+
+Link to [Documentation](https://linktodocumentation) provided here.
+
+
+## Team
+
+- [@IAmFaulty](https://www.github.com/iamfaulty)
+
