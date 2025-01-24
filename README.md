@@ -14,5 +14,8 @@ Link to [Documentation](https://linktodocumentation) provided here.
 
 ## Team
 
-- [@IAmFaulty](https://www.github.com/iamfaulty)
+- [@Alhasan Mohsen](https://www.github.com/iamfaulty)
+- [@Alejandro Albarran](https://www.github.com/AAlejandro8)
+- [@Ethan Lan](https://www.github.com/EthanL135)
+- [@Jerrat Jester](https://www.github.com/JerratJester)
 
