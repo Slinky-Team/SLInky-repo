@@ -4,7 +4,7 @@
 
 # Security Lookup Interface
 
-A project designed to rebuild the Cox Communications current Security Lookup Interface with integrations with all of its APIs and a completely reworked frontend and backend; Created using the React framework and Python respectively.
+A project designed to rebuild an undisclosed Security Lookup Interface with integrations with all of its APIs and a completely reworked frontend and backend; Created using the React framework and Python Flask respectively.
 
 
 ## Documentation
