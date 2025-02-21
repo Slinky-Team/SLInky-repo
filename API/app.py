@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-import os
 import requests
 
 app = Flask(__name__)
@@ -7,8 +6,8 @@ app = Flask(__name__)
 
 
 
-# Base URL localhost
-EXTERNAL_API_URL = 'http://172.19.231.10:7000'
+# your local host
+EXTERNAL_API_URL = 'xxxx'
 
 
 def call_external_api(endpoint, auth=('user', 'pass')):
