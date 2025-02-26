@@ -1,0 +1,13 @@
+ <!DOCTYPE html>
+ <html>
+    <head>
+
+    </head>
+    <body>
+        <div>
+            Click one of the sample calls: <br>
+            <a href="{{ url_for('call_azure', data="1.2.3.4") }}"> Azure </a> <br>
+            <a href="{{ url_for('call_azure', data="alice.bob@example.com") }}"> OKTA </a>
+        </div>
+    </body>
+ </html>
