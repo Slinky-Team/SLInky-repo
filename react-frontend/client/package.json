@@ -15,8 +15,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-api": "cd Backend && flask run --no-debugger",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test-api": "cd api && flask test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
