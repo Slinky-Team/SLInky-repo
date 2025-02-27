@@ -1,0 +1,9 @@
+cryptography
+flask
+flask_httpauth
+flask_restful
+geoip2
+redis
+tld
+validators
+waitress
