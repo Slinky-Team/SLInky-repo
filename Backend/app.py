@@ -1,18 +1,16 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
+# Explicitly allow the React frontend origin
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-
-
-
-# your local host
-EXTERNAL_API_URL = 'http://127.0.0.1:7000'
-
+EXTERNAL_API_URL = 'http://127.0.0.1:7000'  # External API on port 7000
 
 def call_external_api(endpoint, auth=('user', 'pass')):
     try:
-        response = requests.get(endpoint,auth=auth)
+        response = requests.get(endpoint, auth=auth)
         if response.status_code == 200:
             return response.json()
         else:
@@ -20,29 +18,26 @@ def call_external_api(endpoint, auth=('user', 'pass')):
     except requests.exceptions.RequestException as e:
         return {"error": f"Failed to connect to the API: {str(e)}"}
 
-
-# home page route
 @app.route('/home')
 @app.route('/')
 def home():
-     
-     
-# Azure route
-@app.route('/azure/<data>', methods=['GET','POST'])
-def call_azure(data):
-        endpoint = (f'{EXTERNAL_API_URL}/oil/azure/{data}')
-        response = call_external_api(endpoint)
-        return response
-       
+    return jsonify({"message": "Welcome to the Flask API!"})
 
-# okta logs
-@app.route('/okta/<data>', methods=['GET'])
-def call_okta(data):
-        endpoint = (f'{EXTERNAL_API_URL}/oil/okta/{data}')
-        response = call_external_api(endpoint)
-        return response
-       
-                
-       
+@app.route('/search/<data>', methods=['GET'])
+def search(data):
+    # Fetch Azure data
+    azure_endpoint = f'{EXTERNAL_API_URL}/oil/azure/{data}'
+    azure_response = call_external_api(azure_endpoint)
+
+    # Fetch Okta data
+    okta_endpoint = f'{EXTERNAL_API_URL}/oil/okta/{data}'
+    okta_response = call_external_api(okta_endpoint)
+
+    # Combine results
+    return jsonify({
+        "azure": azure_response,
+        "okta": okta_response
+    })
+
 if __name__ == '__main__':
-    app.run(port=7001) 
+    app.run(port=5000, debug=True)
