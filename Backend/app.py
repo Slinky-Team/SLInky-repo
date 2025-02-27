@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, render_template
+from flask import Flask, jsonify
 import requests
 
 app = Flask(__name__)
@@ -25,22 +25,23 @@ def call_external_api(endpoint, auth=('user', 'pass')):
 @app.route('/home')
 @app.route('/')
 def home():
-     return render_template('base.html')
+     
      
 # Azure route
 @app.route('/azure/<data>', methods=['GET','POST'])
 def call_azure(data):
         endpoint = (f'{EXTERNAL_API_URL}/oil/azure/{data}')
         response = call_external_api(endpoint)
-        return render_template('displayjson.html', data = response)
+        return response
+       
 
 # okta logs
 @app.route('/okta/<data>', methods=['GET'])
-
 def call_okta(data):
         endpoint = (f'{EXTERNAL_API_URL}/oil/okta/{data}')
         response = call_external_api(endpoint)
-        return render_template('displayjson.html', data = response)
+        return response
+       
                 
        
 if __name__ == '__main__':
