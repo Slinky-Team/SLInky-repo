@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
+
+// Import pages or components for routing
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -41,44 +47,54 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1>API Search</h1>
+    <Router>
+      <div className="App">
+        <h1>API Search</h1>
 
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Enter search term"
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
-        </button>
-      </form>
+        <Routes>
+          {/* Define routes */}
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
 
-      <div className="results">
-        <h2>Results</h2>
-        {response && (
-          <>
-            <div>
-              <h3>Azure Data</h3>
-              <pre>{JSON.stringify(response.azure || response.error, null, 2)}</pre>
-            </div>
+        {/* The search form remains on every page */}
+        <form onSubmit={handleSearch}>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Enter search term"
+            disabled={loading}
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
 
-            {!response.error && (
+        <div className="results">
+          <h2>Results</h2>
+          {response && (
+            <>
               <div>
-                <h3>Okta Data</h3>
-                <pre>{JSON.stringify(response.okta, null, 2)}</pre>
+                <h3>Azure Data</h3>
+                <pre>{JSON.stringify(response.azure || response.error, null, 2)}</pre>
               </div>
-            )}
-          </>
-        )}
-        {!response && !loading && searchTerm && (
-          <p>No results yet. Try searching!</p>
-        )}
+
+              {!response.error && (
+                <div>
+                  <h3>Okta Data</h3>
+                  <pre>{JSON.stringify(response.okta, null, 2)}</pre>
+                </div>
+              )}
+            </>
+          )}
+          {!response && !loading && searchTerm && (
+            <p>No results yet. Try searching!</p>
+          )}
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
