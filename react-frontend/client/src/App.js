@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './Login'; // Assuming Login and Register components are in the same folder
+import Register from './Register';
+import Dashboard from './Dashboard';
 import './App.css';
-
-// Import pages or components for routing
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,13 +12,9 @@ function App() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    if (!searchTerm) return;
-
-    setLoading(true);
-    setResponse(null);
 
     try {
-      const url = `http://127.0.0.1:5000/search/${searchTerm}`;
+      const url = `http://127.0.0.1:7000/search/${searchTerm}`;
       console.log('Attempting to fetch from:', url);
 
       const result = await fetch(url, {
@@ -46,31 +40,70 @@ function App() {
     }
   };
 
-  return (
-    <Router>
-      <div className="App">
-        <h1>API Search</h1>
+ // Handle login POST request
+ const handleLogin = async (credentials) => {
+  try {
+    const url = 'http://127.0.0.1:7000/login';
+    const result = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
 
-        <Routes>
-          {/* Define routes */}
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Routes>
+    if (!result.ok) {
+      throw new Error(`Login failed: ${result.status} ${result.statusText}`);
+    }
 
-        {/* The search form remains on every page */}
-        <form onSubmit={handleSearch}>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Enter search term"
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Searching...' : 'Search'}
-          </button>
-        </form>
+    const data = await result.json();
+    console.log('Login successful:', data);
+    setCurrentUser({ username: data.username });
+
+  } catch (error) {
+    console.error('Login error:', error.message);
+  }
+};
+
+// Handle register POST request
+const handleRegister = async (userData) => {
+  try {
+    const url = 'http://127.0.0.1:7000/register';
+    const result = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!result.ok) {
+      throw new Error(`Registration failed: ${result.status} ${result.statusText}`);
+    }
+
+    const data = await result.json();
+    console.log('Registration successful:', data);
+    
+    // Redirect to login after successful registration
+    setCurrentUser(null);
+  } catch (error) {
+    console.error('Registration error:', error.message);
+  }
+};
+
+return (
+  <Router>
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Home currentUser={currentUser} />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register onRegister={handleRegister} />} />
+        <Route 
+          path="/dashboard" 
+          element={currentUser ? <Dashboard /> : <Navigate to="/login" />} 
+        />
+      </Routes>
+     
 
         <div className="results">
           <h2>Results</h2>

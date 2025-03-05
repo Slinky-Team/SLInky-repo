@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from models import db, User
 from config import Config
 from flask import session
-
+import requests
 
 
 app = Flask(__name__)
@@ -21,21 +21,16 @@ CORS(app,supports_credentials=True, resources={r"/*": {"origins": "http://localh
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+with app.app_context():
+        db.create_all()
+        
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-import os
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve_react_app(path):
-    react_build_path = os.path.join(os.getcwd(), "react-frontend", "client", "build")
-
-    if path != "" and os.path.exists(os.path.join(react_build_path, path)):
-        return send_from_directory(react_build_path, path)
-    
-    return send_from_directory(react_build_path, "index.html")
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 
 # Register route
@@ -44,7 +39,9 @@ def register():
     data = request.get_json()
     username = data['username']
     password = generate_password_hash(data['password'], method='sha256')
-
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({"message": "Missing username or password!"}), 400
+    
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "User already exists!"}), 400
 
@@ -115,4 +112,5 @@ def search(data):
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    
+    app.run(port=7000, debug=True)
