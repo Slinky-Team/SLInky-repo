@@ -1,0 +1,6 @@
+Run these 3 at the same time to get code to work:
+
+First 2 should run in 'venv'
+1. In 'Backend' run app.py
+2. In 'Count-fakeula' run main.py
+3. In 'react-frontend/client' run "npm start"
