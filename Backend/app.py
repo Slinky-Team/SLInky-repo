@@ -1,6 +1,7 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 import requests
+from db import store_input, get_history, init_db  # Import functions from db.py
 
 app = Flask(__name__)
 # Explicitly allow the React frontend origin
@@ -20,11 +21,13 @@ def call_external_api(endpoint, auth=('user', 'pass')):
 
 @app.route('/home')
 @app.route('/')
-def home():
-    return jsonify({"message": "Welcome to the Flask API!"})
+def index():
+    history = get_history()
+    return render_template('index.html', history=history)
 
 @app.route('/search/<data>', methods=['GET'])
 def search(data):
+
     # Fetch Azure data
     azure_endpoint = f'{EXTERNAL_API_URL}/oil/azure/{data}'
     azure_response = call_external_api(azure_endpoint)
@@ -39,5 +42,23 @@ def search(data):
         "okta": okta_response
     })
 
+@app.route('/history', methods=['GET'])
+def history():
+    return jsonify({"history": get_history()})
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    # Store input in the database (using the function from db.py)
+    store_input()
+    history = get_history()  # Fetch updated history
+    return jsonify({"history": history})  # Return updated history
+
+# Render the index page with history
+# @app.route('/')
+# def index():
+#     history = get_history()
+#     return render_template('index.html', history=history)
+
 if __name__ == '__main__':
+    init_db() # Initialize the database (from db.py)
     app.run(port=5000, debug=True)

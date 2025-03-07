@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Lookup Interface</title> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="../static/styles/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <h1>Slinky</h1>
+    <img width="25%" height="25%" src="../static/SLInky 1-0-1 NoText NoBackground.png" alt="Slinky Logo" class="logo">
+    <form id="searchForm">
+        <label for="search">Enter IP/Domain name</label>
+        <br>
+        <br>
+        <input type="text" name="search" id="search" placeholder="Enter IP/Domain name"/>
+        <button type="submit">Search</button>
+    </form>
+    <h2>Search History</h2> 
+    <ul id="historyList">
+        {% for item in history %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        fetch("/history")
+            .then(response => response.json())
+            .then(data => updateHistory(data.history));
+        });
+        document.getElementById("searchForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // Prevent form from refreshing the page
+        
+            var formData = new FormData(this);
+        
+            fetch("/submit", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateHistory(data.history);
+                document.getElementById("search").value = ""; // Clear input field
+            });
+        });
+        
+        // Function to update the history list dynamically
+        function updateHistory(history) {
+            var historyList = document.getElementById("historyList");
+            historyList.innerHTML = ""; // Clear previous history
+        
+            history.forEach(item => {
+                var li = document.createElement("li");
+                li.textContent = item;
+                historyList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
