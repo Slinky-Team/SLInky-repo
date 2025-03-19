@@ -28,8 +28,8 @@ function Login({ onLogin }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log(`Response: ${response.status}`)
         console.log("USER LOGGED IN. RESPONSE RETURNED OK")
-        console.log(data.message)
         onLogin(data.message); // Update user state in the parent component
         navigate('/api/dashboard'); // Navigate to the main page (home)
       } else {
