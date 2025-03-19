@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link,useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 
 //Login Component
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // This is correct inside the Login component
 
   //Handle form submisson
   const handleSubmit = async (e) => {
@@ -17,18 +18,23 @@ function Login({ onLogin }) {
     try {
       //Send Login request to the backend
       const response = await fetch("/api/login", {
-        method: "GET",
+        method: "POST",
         headers: {
-          Authorization: `Basic ${credentials}`,
+          "Content-Type": "application/json",  // Correct content type for JSON
         },
+        body: JSON.stringify({ username, password }), // Send data as JSON
         credentials: "include", // Include cookies for session management
       });
 
       if (response.ok) {
         const data = await response.json();
+        console.log("USER LOGGED IN. RESPONSE RETURNED OK")
+        console.log(data.message)
         onLogin(data.message); // Update user state in the parent component
+        navigate('/api/dashboard'); // Navigate to the main page (home)
       } else {
-        alert("Login failed. Please check your credentials.");
+        const errorText = await response.text();
+        alert(`Login failed. Please check your credentials. Error: ${errorText}`);
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -81,8 +87,9 @@ function Register({ onRegister }) {
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
-          Authorization: `Basic ${credentials}`, // Include Basic Auth header
+          "Content-Type": "application/json",  // Set Content-Type header
         },
+        body: JSON.stringify({ username, password }),  // Send JSON payload
         credentials: "include", // Include cookies for session management
       });
 
@@ -91,7 +98,8 @@ function Register({ onRegister }) {
         onRegister(data.message); // Update user state in the parent component
         navigate('/login'); // Redirect to the login page after successful registration
       } else {
-        alert("Registration failed. Please try again.");
+        const errorText = await response.text();
+        alert(`Registration failed. Please try again. Error: ${errorText}`);
       }
     } catch (error) {
       console.error("Registration error:", error);

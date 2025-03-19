@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -12,8 +13,9 @@ import requests
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Initialize db and migrate
 db.init_app(app)
-
+migrate = Migrate(app, db)
 
 # Explicitly allow the React frontend origin
 CORS(app,supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -38,7 +40,7 @@ def index():
 def register():
     data = request.get_json()
     username = data['username']
-    password = generate_password_hash(data['password'], method='sha256')
+    password = generate_password_hash(data['password'], method='pbkdf2:sha256')
     if not data or 'username' not in data or 'password' not in data:
         return jsonify({"message": "Missing username or password!"}), 400
     
@@ -55,11 +57,28 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(username=data['username']).first()
+    
 
-    if not user or not check_password_hash(user.password, data['password']):
+    # Retrieve user by username
+    username_input = data['username'].strip()  # Ensure no leading/trailing spaces
+    user = User.query.filter_by(username=username_input).first()
+
+    # Debug: Print out the user object
+    print(f"Query result for username '{username_input}': {user}")
+    # print(f"CURRENT USER: {user} || USERNAME: {user.username} || PASS: {user.password}")
+
+    # Check if the user exists
+    if user == None:
+        print("MSG 1 REACHED!!!!!!!!!!")
         return jsonify({"message": "Invalid credentials!"}), 401
 
+    # Check if the password is correct
+    if not check_password_hash(user.password, data['password']):
+        print("MSG 2 REACHED!!!!!!!!!!")
+        return jsonify({"message": "Invalid credentials!"}), 401
+
+    # If user is valid, proceed with login
+    print("SUCESSS LOGIN!!!!!")
     login_user(user)
     session.permanent = True  # Ensures session persists across restarts
     return jsonify({"message": "Login successful!"}), 200
