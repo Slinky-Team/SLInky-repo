@@ -2,7 +2,8 @@
 ![Logo](https://res.cloudinary.com/dnalq36cn/image/upload/v1737567747/SLInky_1-0-1_HalfSize_wjjqqz.png)
 
 
-# Security Lookup Interface
+# Hyperion
+## By Slinky
 
 A project designed to rebuild an undisclosed Security Lookup Interface with integrations with all of its APIs and a completely reworked frontend and backend; Created using the React framework and Python Flask respectively.
 
