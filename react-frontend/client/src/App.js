@@ -1,228 +1,44 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Dashboard from './components/Dashboard';
+import Home from './components/home';
 import './App.css';
 
-//Login Component
-function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // This is correct inside the Login component
-
-  //Handle form submisson
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Encode credentials for Basic Auth
-    const credentials = btoa(`${username}:${password}`);
-
-    try {
-      //Send Login request to the backend
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",  // Correct content type for JSON
-        },
-        body: JSON.stringify({ username, password }), // Send data as JSON
-        credentials: "include", // Include cookies for session management
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`Response: ${response.status}`)
-        console.log("USER LOGGED IN. RESPONSE RETURNED OK")
-        onLogin(data.message); // Update user state in the parent component
-        navigate('/api/dashboard'); // Navigate to the main page (home)
-      } else {
-        const errorText = await response.text();
-        alert(`Login failed. Please check your credentials. Error: ${errorText}`);
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("An error occurred during login.");
-    }
-  };
-
-  return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <h2>Login</h2>
-        
-        <input //UserName Input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        <input //Password Input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-        <p>
-          Don't have an account? <Link to="/register">Register here</Link>
-        </p>
-      </form>
-    </div>
-  );
-}
-
-function Register({ onRegister }) {
-  const [username, setUsername] = useState(''); // State for username input
-  const [password, setPassword] = useState(''); // State for password input
-  const navigate = useNavigate(); // Initialize useNavigate
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Encode credentials for Basic Auth
-    const credentials = btoa(`${username}:${password}`);
-
-    try {
-      // Send registration request to the backend
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",  // Set Content-Type header
-        },
-        body: JSON.stringify({ username, password }),  // Send JSON payload
-        credentials: "include", // Include cookies for session management
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        onRegister(data.message); // Update user state in the parent component
-        navigate('/login'); // Redirect to the login page after successful registration
-      } else {
-        const errorText = await response.text();
-        alert(`Registration failed. Please try again. Error: ${errorText}`);
-      }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("An error occurred during registration.");
-    }
-  };
-
-  return (
-    <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <h2>Register</h2>
-        {/* Username input */}
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        {/* Password input */}
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        {/* Submit button */}
-        <button type="submit">Register</button>
-        {/* Link to login page */}
-        <p>
-          Already have an account? <Link to="/login">Login here</Link>
-        </p>
-      </form>
-    </div>
-  );
-}
-
 function App() {
-  const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    // Fetch the current user on initial load (to check if already logged in)
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch('/api/dashboard', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCurrentUser({ username: data.username });
+        }
+      } catch (error) {
+        console.error('Failed to fetch current user', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []); // Empty dependency array means this runs once when the component mounts
 
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login onLogin={setUser} />} />
-        <Route path="/register" element={<Register onRegister={setUser} />} />
-        <Route path="/" element={user ? <MainApp user={user} setUser={setUser} /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Home currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
+        <Route path="/login" element={<Login onLogin={setCurrentUser} />} />
+        <Route path="/register" element={<Register onRegister={setCurrentUser} />} />
+        <Route path="/dashboard" element={currentUser ? <Dashboard user={currentUser} /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
-  );
-}
-
-function MainApp({ user, setUser }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [response, setResponse] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const handleLogout = () => {
-    setUser(null); // Clear the user state
-  };
-
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!searchTerm) return;
-
-    setLoading(true);
-    setResponse(null);
-
-    try {
-      const url = `http://127.0.0.1:5000/search/${searchTerm}`;
-      const result = await fetch(url, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: "include"
-      });
-
-      if (!result.ok) throw new Error(`Fetch failed with status: ${result.status} ${result.statusText}`);
-      const data = await result.json();
-      setResponse(data);
-    } catch (error) {
-      console.error('Fetch error:', error.message);
-      setResponse({ error: `Failed to fetch data: ${error.message}` });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="App">
-      <h1>API Search</h1>
-      <p>Welcome, {user}!</p>
-      <button onClick={handleLogout}>Logout</button>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Enter search term"
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
-        </button>
-      </form>
-      <div className="results">
-        <h2>Results</h2>
-        {response && (
-          <>
-            <div>
-              <h3>Azure Data</h3>
-              <pre>{JSON.stringify(response.azure || response.error, null, 2)}</pre>
-            </div>
-            {!response.error && (
-              <div>
-                <h3>Okta Data</h3>
-                <pre>{JSON.stringify(response.okta, null, 2)}</pre>
-              </div>
-            )}
-          </>
-        )}
-        {!response && !loading && searchTerm && <p>No results yet. Try searching!</p>}
-      </div>
-    </div>
   );
 }
 

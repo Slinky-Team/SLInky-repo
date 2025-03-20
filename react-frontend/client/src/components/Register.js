@@ -1,82 +1,45 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
-const Register = ({ form, errors, currentUser }) => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
-  });
+function Register({ onRegister }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        onRegister(data.message);
+        navigate('/login');
+      } else {
+        alert(`Registration failed: ${await response.text()}`);
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("An error occurred during registration.");
+    }
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-      <div className="card p-4 shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
-        <h2 className="text-center mb-4" style={{ color: '#4A90E2' }}>
-          Create Your Account
-        </h2>
-        <p className="text-center mb-4" style={{ color: '#7A7A7A' }}>
-          Fill in the details to register.
-        </p>
-
-        {/* Display validation errors */}
-        {errors && errors.map((error, index) => (
-          <div className="alert alert-danger" key={index}>{error}</div>
-        ))}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="form-control border-primary"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-control border-primary"
-            />
-          </div>
-
-          <div className="mb-3">
-            <label className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="form-control border-primary"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary w-100 py-2">
-            Register
-          </button>
-        </form>
-
-        <p className="mt-3 text-center">
-          Already have an account? <a href="/login" className="text-primary">Login</a>
-        </p>
-      </div>
+    <div className="form-container">
+      <form onSubmit={handleSubmit}>
+        <h2>Register</h2>
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
+        <button type="submit">Register</button>
+        <p>Already have an account? <Link to="/login">Login here</Link></p>
+      </form>
     </div>
   );
-};
+}
 
 export default Register;

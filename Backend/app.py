@@ -81,7 +81,7 @@ def login():
     print("SUCESSS LOGIN!!!!!")
     login_user(user)
     session.permanent = True  # Ensures session persists across restarts
-    return jsonify({"message": "Login successful!"}), 200
+    return jsonify({"message": "Login successful!", "redirect": "/"}), 200
 
 # Dashboard route (only accessible to logged-in users)
 @app.route('/api/dashboard', methods=['GET'])
@@ -91,9 +91,8 @@ def dashboard():
 
 # Logout route
 @app.route('/api/logout', methods=['POST'])
-@login_required
 def logout():
-    logout_user()
+    session.pop('user_id', None)  # Clear the session manually
     return jsonify({"message": "Logged out successfully!"}), 200
 
 
