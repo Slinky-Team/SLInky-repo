@@ -113,21 +113,10 @@ const Dashboard = () => {
 
         {/* Right Results Section */}
         <div className="results-section">
-          {/* Internal Lookup Results */}
+          {/* Combined Lookup Results */}
           <div className="lookup-container">
             <div className="lookup-header">
-              <h3 className="lookup-title">Internal Lookup Results</h3>
-              <button className="export-button">Export CSV</button>
-            </div>
-            <div className="results-box">
-              <SearchResultsList results={results} />
-            </div>
-          </div>
-
-          {/* External Lookup Results */}
-          <div className="lookup-container">
-            <div className="lookup-header">
-              <h3 className="lookup-title">External Lookup Results</h3>
+              <h3 className="lookup-title">Lookup Results</h3>
               <button className="export-button">Export CSV</button>
             </div>
             <div className="results-box">
