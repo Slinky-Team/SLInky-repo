@@ -1,0 +1,158 @@
+/* Dashboard.css */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .dashboard-container {
+    background: #1e1e1e;
+    min-height: 100vh;
+    padding: 20px;
+    color: #fff;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  header h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  header a {
+    color: #00ffea;
+    margin-left: 20px;
+    text-decoration: none;
+  }
+  
+  header a:hover {
+    text-decoration: underline;
+  }
+  
+  .sidebar {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    height: 600px;
+    overflow-y: auto;
+  }
+  
+  .sidebar h5 {
+    color: #000000;
+    margin-bottom: 15px;
+  }
+  
+  .sidebar textarea {
+    width: 100%;
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 10px;
+    resize: none;
+  }
+  
+  .sidebar textarea::placeholder {
+    color: #888;
+  }
+  
+  .sidebar button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: #00ffea;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .sidebar button:hover {
+    background: #00d1c1;
+  }
+  
+  .indicators {
+    margin: 15px 0;
+  }
+  
+  .indicators span {
+    margin-right: 20px;
+  }
+  
+  .main-content {
+    background: #2a2a2a;
+    padding: 20px;
+    border-radius: 8px;
+    height: 600px;
+    overflow-y: auto;
+  }
+  
+  .main-content h5 {
+    margin-bottom: 15px;
+  }
+  
+  .main-content button {
+    padding: 8px 16px;
+    background: #00ffea;
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .main-content button:hover {
+    background: #00d1c1;
+  }
+
+  .data-record {
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .data-record h5 {
+    padding: 8px 12px;
+    margin: 0;
+    background-color: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  .data-table th {
+    background-color: #f8f9fa;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+  }
+  
+  .data-table td {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    vertical-align: top;
+  }
+  
+  .property-name {
+    font-weight: 600;
+    width: 25%;
+    background-color: #f8f9fa;
+  }
+  
+  .property-value pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: 12px;
+    background-color: #f0f0f0;
+    padding: 8px;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow: auto;
+  }

@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\speed\OneDrive\Documents\CountFakeula\count-fakeula-2025-01-24\count-fakeula\venv
+set VIRTUAL_ENV=C:\Users\Alejandro\SLInky-repo\count-fakeula\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
