@@ -1,158 +1,235 @@
-/* Dashboard.css */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  .dashboard-container {
-    background: #1e1e1e;
-    min-height: 100vh;
-    padding: 20px;
-    color: #fff;
-  }
-  
-  header {
-    display: flex;
-    justify-content: space-between;
+/* General Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+/* Main Dashboard Container */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transition: background 0.3s;
+}
+
+/* Dark Mode */
+.dashboard-container.dark-mode {
+  background: #1e1e1e;
+  color: #f5f5f5;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #0099ff, #00cc99);
+  padding: 10px 20px;
+  color: white;
+  font-size: 1.2em;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.header-links {
+  display: flex;
+  align-items: center;
+}
+
+.header-links a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+.header-links a:hover {
+  text-decoration: underline;
+}
+
+.dark-mode-toggle {
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.dark-mode-toggle:hover {
+  text-decoration: underline;
+}
+
+/* Main Layout */
+.dashboard-layout {
+  display: flex;
+  flex: 1;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* Search Panel */
+.search-panel {
+  background: white;
+  padding: 20px;
+  width: 25%;
+  min-width: 280px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.search-panel h3 {
+  margin-bottom: 15px;
+}
+
+.search-box {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.search-box textarea {
+  width: 100%;
+  height: 720px; /* Elongated text area */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none;
+}
+
+.search-button {
+  background: linear-gradient(90deg, #0099ff, #00cc99);
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  border-radius: 5px;
+  width: 30%;
+}
+
+.search-button:hover {
+  background: linear-gradient(90deg, #007acc, #009966);
+}
+
+.search-options {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.radio-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.radio-buttons label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.export-button {
+  background: linear-gradient(90deg, #0099ff, #00cc99);
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  border-radius: 5px;
+  width: 30%;
+}
+
+.export-button:hover {
+  background: #009966;
+}
+
+/* Results Section */
+.results-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+/* Lookup Container */
+.lookup-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+/* Lookup Header */
+.lookup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(90deg, #0099ff, #00cc99);
+  border-radius: 5px 5px 0 0; /* Rounded corners at the top */
+  border: 1px solid #ccc; /* Border around the header */
+  margin-bottom: 10px; /* Space between header and results */
+}
+
+.lookup-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 0; /* Remove default margin */
+  color: #333; /* Dark text color */
+}
+
+.lookup-header .export-button {
+  background: linear-gradient(180deg, #0099ff, #00cc99);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.9em;
+  border-radius: 5px;
+  transition: background 0.3s;
+}
+
+.lookup-header .export-button:hover {
+  background: #009966;
+}
+
+/* Results Box */
+.results-box {
+  padding: 15px;
+  border: 1px solid #ccc; /* Border around the results */
+  border-radius: 5px; /* Rounded corners */
+  background: #f9f9f9; /* Light background for the results */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  header h1 {
-    font-size: 24px;
-    margin: 0;
-  }
-  
-  header a {
-    color: #00ffea;
-    margin-left: 20px;
-    text-decoration: none;
-  }
-  
-  header a:hover {
-    text-decoration: underline;
-  }
-  
-  .sidebar {
-    background: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    height: 600px;
-    overflow-y: auto;
-  }
-  
-  .sidebar h5 {
-    color: #000000;
-    margin-bottom: 15px;
-  }
-  
-  .sidebar textarea {
-    width: 100%;
-    background: #333;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 10px;
-    resize: none;
-  }
-  
-  .sidebar textarea::placeholder {
-    color: #888;
-  }
-  
-  .sidebar button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    background: #00ffea;
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .sidebar button:hover {
-    background: #00d1c1;
-  }
-  
-  .indicators {
-    margin: 15px 0;
-  }
-  
-  .indicators span {
-    margin-right: 20px;
-  }
-  
-  .main-content {
-    background: #2a2a2a;
-    padding: 20px;
-    border-radius: 8px;
-    height: 600px;
-    overflow-y: auto;
-  }
-  
-  .main-content h5 {
-    margin-bottom: 15px;
-  }
-  
-  .main-content button {
-    padding: 8px 16px;
-    background: #00ffea;
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .main-content button:hover {
-    background: #00d1c1;
   }
 
-  .data-record {
-    margin-bottom: 20px;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  
-  .data-record h5 {
-    padding: 8px 12px;
-    margin: 0;
-    background-color: #e9ecef;
-    border-bottom: 1px solid #dee2e6;
-  }
-  
-  .data-table {
+  .search-panel {
     width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
   }
-  
-  .data-table th {
-    background-color: #f8f9fa;
-    text-align: left;
-    padding: 10px;
-    border: 1px solid #dee2e6;
+
+  .results-section {
+    width: 100%;
   }
-  
-  .data-table td {
-    padding: 10px;
-    border: 1px solid #dee2e6;
-    vertical-align: top;
-  }
-  
-  .property-name {
-    font-weight: 600;
-    width: 25%;
-    background-color: #f8f9fa;
-  }
-  
-  .property-value pre {
-    margin: 0;
-    white-space: pre-wrap;
-    font-size: 12px;
-    background-color: #f0f0f0;
-    padding: 8px;
-    border-radius: 4px;
-    max-height: 200px;
-    overflow: auto;
-  }
+}
