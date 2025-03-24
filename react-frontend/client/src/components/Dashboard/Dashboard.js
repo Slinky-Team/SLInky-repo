@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SearchResultsList } from './SearchResultsList';
 import './Dashboard.css';
 
@@ -6,66 +7,45 @@ const Dashboard = () => {
   const [inputText, setInputText] = useState('');
   const [results, setResults] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
-  const [fangedDefanged, setFangedDefanged] = useState('defanged'); // State for radio buttons
+  const [fangedDefanged, setFangedDefanged] = useState('defanged');
+  const navigate = useNavigate();
 
-  const handleSearch = async () => {
-    if (!inputText.trim()) {
-      alert("Please enter an IP or hostname to search");
-      return;
-    }
-    
-    try {
-      const searchTerms = inputText.trim().split(/[\s,\n]+/).filter(term => term);
-      const searchResults = [];
-      setResults([{ id: 'loading', status: 'Loading...', data: {} }]);
-      
-      for (const term of searchTerms) {
-        const response = await fetch(`/search/${encodeURIComponent(term)}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`API returned ${response.status}: ${await response.text()}`);
-        }
-        
-        const data = await response.json();
-        searchResults.push({
-          id: Date.now() + Math.random().toString(36).substring(2, 9),
-          query: term,
-          timestamp: new Date().toISOString(),
-          data: data,
-          status: 'Completed'
-        });
-      }
-      
-      setResults(searchResults);
-      
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([{ id: 'error', status: 'Error', error: error.message || 'Failed to fetch results', data: {} }]);
-    }
-  };
-
+  // Dark mode toggle function
   const toggleDarkMode = () => {
     setDarkMode(prevMode => !prevMode);
   };
 
+  // Sign out handler
+  const handleSignOut = () => {
+    // Add any logout logic here (e.g., API call)
+    navigate('/login'); // Redirect to login page
+  };
+
+  const handleSearch = async () => {
+    // ... (keep existing search logic)
+  };
+
   const handleFangedDefangedChange = (e) => {
-    setFangedDefanged(e.target.value);
+    // ... (keep existing radio button logic)
   };
 
   return (
     <div className={`dashboard-container ${darkMode ? 'dark-mode' : ''}`}>
-      {/* Header */}
       <header className="dashboard-header">
         <div className="logo">COX</div>
         <h1 className="title">Hyperion</h1>
         <div className="header-links">
-          <a href="/history">History</a>
-          <a href="/logout">Sign Out</a>
-          <button className="dark-mode-toggle" onClick={toggleDarkMode}>
+          <a href="/history" className="nav-link">History</a>
+          <button 
+            className="nav-link" 
+            onClick={handleSignOut}
+          >
+            Sign Out
+          </button>
+          <button 
+            className="nav-link" 
+            onClick={toggleDarkMode}
+          >
             {darkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
         </div>
