@@ -6,7 +6,6 @@ export const SearchResult = ({ result }) => {
     <div className="result-item">
       <div className="result-header">
         <div className="query-info">
-          <strong>Query: {result.query} </strong>
           <span className="timestamp">{new Date(result.timestamp).toLocaleString()}</span>
         </div>
       </div>

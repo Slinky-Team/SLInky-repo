@@ -1,1 +1,13 @@
-1.2.3.4
+Whois & IP Information
+
+IP Information for 23.227.202[.]159
+
+IP Location: United States Tampa Hivelocity Ventures Corp
+
+ASN: AS29802 HVC-AS, US (registered May 08, 2003)
+
+Resolve Host: 23-227-202-159.static.hvvc[.]us
+
+-----------------------------------------------------
+
+Related Open-Source Intelligence (OSINT): https://thedfirreport.com/2024/09/30/nitrogen-campaign-drops-sliver-and-ends-with-blackcat-ransomware/ (Sep 2024) https://blog.sekoia.io/exposing-fakebat-loader-distribution-methods-and-adversary-infrastructure/ (Jul 2024) https://cloud.google.com/blog/topics/threat-intelligence/ransomware-attacks-surge-rely-on-public-legitimate-tools (Jun 2024) https://www.rapid7.com/blog/post/2024/05/13/ongoing-malvertising-campaign-leads-to-ransomware/ (May 2024) https://www.threatdown.com/blog/active-nitrogen-campaign-delivered-via-malicious-ads-for-putty-filezilla/ (Apr 2024) https://www.malwarebytes.com/blog/threat-intelligence/2024/01/nitrogen-shelling-malware-from-hacked-sites (Jan 2024) https://www.esentire.com/blog/nitrogen-campaign-2-0-reloads-with-enhanced-capabilities-leading-to-alphv-blackcat-ransomware (Oct 2023) https://news.sophos.com/en-us/2023/07/26/into-the-tank-with-nitrogen/ (Jul 2023) https://www.esentire.com/blog/persistent-connection-established-nitrogen-campaign-leverages-dll-side-loading-technique-for-c2-communication (Jun 2023) https://malpedia.caad.fkie.fraunhofer.de/details/win.cobalt_strike https://www.crowdstrike.com/adversaries/nitro-spider/ https://github.com/Sentinel-One/CobaltStrikeParser 

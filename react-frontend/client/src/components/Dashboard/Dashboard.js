@@ -69,8 +69,9 @@ const Dashboard = () => {
   };
 
   const handleFangedDefangedChange = (e) => {
-    // ... (keep existing radio button logic)
-  };
+   
+    
+  }
 
   return (
     <div className={`dashboard-container ${darkMode ? 'dark-mode' : ''}`}>
