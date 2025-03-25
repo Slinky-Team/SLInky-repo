@@ -1,0 +1,27 @@
+/* SearchResultsList.css */
+.results-table-container {
+    background: #1e1e1e;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .results-table th,
+  .results-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #444;
+    color: #fff;
+  }
+  
+  .results-table th {
+    background: #333;
+    position: sticky;
+    top: 0;
+  }

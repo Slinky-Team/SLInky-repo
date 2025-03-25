@@ -1,0 +1,12 @@
+/* SearchResult.css */
+.search-result button {
+    background: none;
+    border: none;
+    color: #00ffea;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  .search-result button:hover {
+    color: #00d1c1;
+  }
