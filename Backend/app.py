@@ -99,49 +99,40 @@ def logout():
 
 
 
-EXTERNAL_API_URL = 'http://127.0.0.1:5000'  # External API on port 7000
+IOC_EXTRACTOR_URL = "http://localhost:5000/extract"
+auth = ('user', 'pass')
+OUTPUT_FILE = "output.txt"
 
-def call_external_api(endpoint, auth=('user', 'pass')):
+@app.route("/search-and-extract", methods=["POST"])
+def search_and_extract():
+    text = request.get_data(as_text=True)  # Get text from React
+    print("Received text:", repr(text))
+
     try:
-        response = requests.get(endpoint, auth=auth)
+        # Save the text to output.txt
+        with open(OUTPUT_FILE, "w") as file:
+            file.write(text)
+
+        # Read the contents of output.txt
+        with open(OUTPUT_FILE, "r") as file:
+            file_content = file.read()
+
+        # Call the IOC extraction API with the file content
+        response = requests.post(
+            IOC_EXTRACTOR_URL,
+            headers={"Content-Type": "text/plain"},
+            auth=auth,
+            data=file_content  # Send contents of output.txt
+        )
+
         if response.status_code == 200:
-            return response.json()
+            ioc_data = response.json()
+            return jsonify(ioc_data), 200
         else:
-            return {"error": "Failed to fetch data", "status_code": response.status_code}
-    except requests.exceptions.RequestException as e:
-        return {"error": f"Failed to connect to the API: {str(e)}"}
+            return jsonify({"error": "IOC extraction failed"}), 500
 
-
-@app.route('/search/<data>', methods=['GET'])
-def search(data):
-    # Define available endpoints 
-    available_endpoints = {
-        "azure": f'{EXTERNAL_API_URL}/oil/azure/{data}',
-        "coxsight": f'{EXTERNAL_API_URL}/oil/coxsight/{data}',
-        "okta": f'{EXTERNAL_API_URL}/oil/okta/{data}',
-        "geo": f'{EXTERNAL_API_URL}/geo/{data}',
-    }
-    
-    # Get endpoints to query from request parameters or use all available
-    endpoints_to_query = request.args.getlist('endpoints') or available_endpoints.keys()
-    
-    # Filter to only valid endpoints
-    valid_endpoints = [ep for ep in endpoints_to_query 
-                       if ep in available_endpoints]
-    
-    # Initialize results dictionary
-    # key = endpoint name
-    # val = the json response
-    results = {}
-    
-    # Query each requested endpoint
-    for endpoint_name in valid_endpoints:
-        endpoint_url = available_endpoints[endpoint_name]
-        response = call_external_api(endpoint_url)
-        results[endpoint_name] = response
-    
-    return jsonify(results)
-
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     

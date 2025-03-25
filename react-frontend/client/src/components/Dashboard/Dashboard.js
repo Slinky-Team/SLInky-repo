@@ -22,7 +22,50 @@ const Dashboard = () => {
   };
 
   const handleSearch = async () => {
-    // ... (keep existing search logic)
+    if (!inputText.trim()) {
+      alert('Please enter some text to search');
+      return;
+    }
+
+    try {
+      setResults([{ id: 'loading', status: 'Loading...', data: {} }]);
+
+      // Send the raw text to the backend for extraction
+      const response = await fetch('http://localhost:7000/search-and-extract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: inputText,
+        credentials: 'include', 
+      });
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+
+      // Format the result into a single entry (since IOC endpoint handles everything)
+      const searchResult = {
+        id: Date.now().toString(),
+        query: inputText.trim(), // Use the full input as the query
+        timestamp: new Date().toISOString(),
+        data: data.data, // The JSON from the IOC extraction API
+        status: 'Completed',
+      };
+
+      setResults([searchResult]);
+
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([{
+        id: 'error',
+        status: 'Error',
+        error: error.message || 'Failed to fetch results',
+        data: {},
+      }]);
+    }
   };
 
   const handleFangedDefangedChange = (e) => {
