@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard/Dashboard';
+import History from './components/History'
 import Home from './components/home';
 import './App.css';
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/login" element={<Login onLogin={setCurrentUser} />} />
         <Route path="/register" element={<Register onRegister={setCurrentUser} />} />
         <Route path="/dashboard" element={currentUser ? <Dashboard user={currentUser} /> : <Navigate to="/login" />} />
+        <Route path="/history" element={currentUser ? <History /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

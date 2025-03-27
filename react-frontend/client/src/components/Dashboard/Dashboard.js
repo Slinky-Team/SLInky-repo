@@ -20,6 +20,10 @@ const Dashboard = () => {
     // Add any logout logic here (e.g., API call)
     navigate('/login'); // Redirect to login page
   };
+  
+  const handleHistory = () => {
+    navigate('/History'); 
+  };
 
   const handleSearch = async () => {
     if (!inputText.trim()) {
@@ -31,7 +35,7 @@ const Dashboard = () => {
       setResults([{ id: 'loading', status: 'Loading...', data: {} }]);
 
       // Send the raw text to the backend for extraction
-      const response = await fetch('http://localhost:7000/search-and-extract', {
+      const response = await fetch('/search-and-extract', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',
@@ -54,6 +58,14 @@ const Dashboard = () => {
         data: data.data, // The JSON from the IOC extraction API
         status: 'Completed',
       };
+
+      // Save to backend history
+      await fetch('/api/search-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(searchResult)
+      });
 
       setResults([searchResult]);
 
@@ -79,7 +91,12 @@ const Dashboard = () => {
         <div className="logo">COX</div>
         <h1 className="title">Hyperion</h1>
         <div className="header-links">
-          <a href="/history" className="nav-link">History</a>
+          <button 
+            className="nav-link"
+            onClick={handleHistory}
+          >
+            History
+          </button>
           <button 
             className="nav-link" 
             onClick={handleSignOut}
