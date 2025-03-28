@@ -4,10 +4,11 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from models import db, User
+from models import db, User, SearchHistory
 from config import Config
 from flask import session
 import requests
+import json
 
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 with app.app_context():
-        db.create_all()
+    db.create_all()
         
 @login_manager.user_loader
 def load_user(user_id):
@@ -99,14 +100,13 @@ def logout():
 
 
 
-IOC_EXTRACTOR_URL = "http://localhost:5000/extract"
+IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
 auth = ('user', 'pass')
 OUTPUT_FILE = "output.txt"
 
 @app.route("/search-and-extract", methods=["POST"])
 def search_and_extract():
-    text = request.get_data(as_text=True)  # Get text from React
-    print("Received text:", repr(text))
+    text = request.get_data(as_text=True)
 
     try:
         # Save the text to output.txt
@@ -134,6 +134,93 @@ def search_and_extract():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Add a route to save search history
+@app.route('/api/search-history', methods=['POST', 'OPTIONS'])
+@login_required
+def save_search_history():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({"message": "No data provided"}), 400
+        
+    try:
+        new_search = SearchHistory(
+            user_id=current_user.id,
+            query=data.get('query', ''),
+            status=data.get('status', 'Completed'),
+            result_data=data.get('data', {})
+        )
+       
+       
+        db.session.add(new_search)
+        db.session.commit()
+        
+        return jsonify({"message": "Search history saved", "id": new_search.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error saving search history: {str(e)}"}), 500
+
+# Add a route to get search history
+@app.route('/api/search-history', methods=['GET', 'OPTIONS'])
+@login_required
+def get_search_history():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        # Get all records first
+        all_history = db.session.query(SearchHistory).all()
+        
+        # Filter for current user
+        user_history = [item for item in all_history if item.user_id == current_user.id]
+        
+        # Sort (newest first)
+        user_history.sort(key=lambda x: x.timestamp, reverse=True)
+        
+        
+        result = []
+        for item in user_history:
+            data = item.to_dict()
+            # Add username from current_user 
+            data['username'] = current_user.username
+            result.append(data)
+            
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error retrieving history: {str(e)}")
+        return jsonify({"message": f"Error retrieving search history: {str(e)}"}), 500
+    
+# delete search history
+@app.route('/api/search-history/clear', methods=['DELETE', 'OPTIONS'])
+@login_required
+def clear_search_history():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        # Get all records first 
+        all_history = db.session.query(SearchHistory).all()
+        
+        # Filter for current user
+        user_history = [item for item in all_history if item.user_id == current_user.id]
+        
+
+        # Delete each record
+        for item in user_history:
+            db.session.delete(item)
+        
+        # Commit the changes
+        db.session.commit()
+        
+        return jsonify({"message": "Search history cleared successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error clearing history: {str(e)}")
+        return jsonify({"message": f"Error clearing search history: {str(e)}"}), 500
+    
 if __name__ == '__main__':
     
     app.run(port=7000, debug=True)
