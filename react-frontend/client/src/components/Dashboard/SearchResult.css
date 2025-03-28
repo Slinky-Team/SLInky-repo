@@ -10,3 +10,34 @@
   .search-result button:hover {
     color: #00d1c1;
   }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .result-table th,
+  .result-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left; 
+  }
+  
+  .ip {
+    
+  }
+
+  .result-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  
+  .result-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .result-table tr:hover {
+    background-color: #f1f1f1;
+  }
