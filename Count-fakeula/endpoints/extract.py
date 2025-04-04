@@ -3,7 +3,7 @@ import validators
 
 from tld import get_tld, get_fld
 
-from flask import request
+from flask import request, current_app
 from flask_restful import reqparse
 from .auth import AuthenticatedResource
 
@@ -18,22 +18,30 @@ class IOCExtractor(AuthenticatedResource):
         parser = reqparse.RequestParser()
         parser.add_argument('raw', default=None, location="args")
         args = parser.parse_args()
-        
-        if request.content_type == 'text/plain':
-            text = request.data.decode('utf-8').rstrip()
-        else:
-            return { 'error' : "Content-type must be text/plain" }, 400
 
-        data = self.extract_iocs(text)
+        try:
+            if request.content_type == 'text/plain':
+                text = request.data.decode('utf-8').rstrip()
+                current_app.logger.info(f"Received text: {text}")  # Log the received text
+            else:
+                current_app.logger.error("Invalid content type")
+                return { 'error' : "Content-type must be text/plain" }, 400
 
-        # Raw output just returns the IOCs
-        if args.raw != None:
-            data = [ x['threat']['indicator']['description'] for x in data ]
+            data = self.extract_iocs(text)
 
-        if data:            
-            return { 'data' : data }, 200
-        else:
-            return { 'data' : data }, 404
+            if args.raw != None:
+                data = [ x['threat']['indicator']['description'] for x in data ]
+
+            if data:
+                current_app.logger.info(f"Extracted data: {data}")  # Log the extracted data
+                return { 'data' : data }, 200
+            else:
+                current_app.logger.warning("No IOCs found")
+                return { 'data' : data }, 404
+
+        except Exception as e:
+            current_app.logger.error(f"Error during IOC extraction: {str(e)}")
+            return { 'error': str(e) }, 500
 
     def extract_iocs(self, text):
         # Some sets to avoid duplication of IOCs

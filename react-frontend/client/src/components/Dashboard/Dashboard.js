@@ -12,17 +12,16 @@ const Dashboard = () => {
 
   // Dark mode toggle function
   const toggleDarkMode = () => {
-    setDarkMode(prevMode => !prevMode);
+    setDarkMode((prevMode) => !prevMode);
   };
 
   // Sign out handler
   const handleSignOut = () => {
-    // Add any logout logic here (e.g., API call)
     navigate('/login'); // Redirect to login page
   };
-  
+
   const handleHistory = () => {
-    navigate('/History'); 
+    navigate('/History');
   };
 
   const handleSearch = async () => {
@@ -30,60 +29,83 @@ const Dashboard = () => {
       alert('Please enter some text to search');
       return;
     }
-
+  
     try {
       setResults([{ id: 'loading', status: 'Loading...', data: {} }]);
-
-      // Send the raw text to the backend for extraction
+  
+      // Step 1: Call the search-and-extract method
       const response = await fetch('/search-and-extract', {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',
         },
         body: inputText,
-        credentials: 'include', 
+        credentials: 'include',
       });
-
+  
       if (!response.ok) {
         throw new Error(`API returned ${response.status}: ${await response.text()}`);
       }
-
+  
       const data = await response.json();
-
-      // Format the result into a single entry (since IOC endpoint handles everything)
-      const searchResult = {
-        id: Date.now().toString(),
-        query: inputText.trim(), // Use the full input as the query
-        timestamp: new Date().toISOString(),
-        data: data.data, // The JSON from the IOC extraction API
-        status: 'Completed',
-      };
-
-      // Save to backend history
-      await fetch('/api/search-history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(searchResult)
-      });
-
-      setResults([searchResult]);
-
+      console.log('Raw data from /search-and-extract:', data);
+  
+      // Step 2: Extract keys from the response
+      const processedKeys = data.data?.map(item => item.threat?.indicator?.description); // Extract the "description" field as the key
+      console.log('Extracted keys:', processedKeys);
+  
+      // Ensure the keys are unique
+      const uniqueKeys = [...new Set(processedKeys)];
+  
+      if (uniqueKeys.length === 0) {
+        console.error('No valid keys to send to oil.py');
+        return;
+      }
+  
+      // Step 3: Call the oil function for each key
+      for (const key of uniqueKeys) {
+        console.log(`Sending request to /oil with key: ${encodeURIComponent(key)}`);
+        const oilResponse = await fetch(`/oil?key=${encodeURIComponent(key)}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+  
+        if (!oilResponse.ok) {
+          console.error(`Oil API returned ${oilResponse.status}: ${await oilResponse.text()}`);
+        } else {
+          const oilResult = await oilResponse.json();
+          console.log(`Oil processing result for key ${key}:`, oilResult);
+  
+          // Update the results with the oil processing output
+          setResults(prevResults => [
+            ...prevResults,
+            {
+              id: Date.now().toString(),
+              query: inputText.trim(),
+              timestamp: new Date().toISOString(),
+              data: oilResult.data || [], // Ensure `data` is an array
+              status: 'Completed',
+            },
+          ]);
+        }
+      }
     } catch (error) {
       console.error('Search error:', error);
-      setResults([{
-        id: 'error',
-        status: 'Error',
-        error: error.message || 'Failed to fetch results',
-        data: {},
-      }]);
+      setResults([
+        {
+          id: 'error',
+          status: 'Error',
+          error: error.message || 'Failed to fetch results',
+          data: [],
+        },
+      ]);
     }
   };
 
   const handleFangedDefangedChange = (e) => {
-   
-    
-  }
+    setFangedDefanged(e.target.value);
+  };
 
   return (
     <div className={`dashboard-container ${darkMode ? 'dark-mode' : ''}`}>
@@ -91,22 +113,13 @@ const Dashboard = () => {
         <div className="logo">COX</div>
         <h1 className="title">Hyperion</h1>
         <div className="header-links">
-          <button 
-            className="nav-link"
-            onClick={handleHistory}
-          >
+          <button className="nav-link" onClick={handleHistory}>
             History
           </button>
-          <button 
-            className="nav-link" 
-            onClick={handleSignOut}
-          >
+          <button className="nav-link" onClick={handleSignOut}>
             Sign Out
           </button>
-          <button 
-            className="nav-link" 
-            onClick={toggleDarkMode}
-          >
+          <button className="nav-link" onClick={toggleDarkMode}>
             {darkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
         </div>
@@ -118,7 +131,9 @@ const Dashboard = () => {
         <div className="search-panel">
           <div className="search-header">
             <h3>Search IP/Hostname</h3>
-            <button className="search-button" onClick={handleSearch}>Search</button>
+            <button className="search-button" onClick={handleSearch}>
+              Search
+            </button>
           </div>
           <div className="search-box">
             <textarea

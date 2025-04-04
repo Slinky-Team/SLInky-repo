@@ -96,10 +96,24 @@ def logout():
     session.pop('user_id', None)  # Clear the session manually
     return jsonify({"message": "Logged out successfully!"}), 200
 
+OIL_API_URL = "http://127.0.0.1:5000/oil"
 
+@app.route("/oil", methods=["GET"])
+def proxy_oil_request():
+    key = request.args.get('key')
+    print(f"Received request for /oil with key: {key}")  # Debug log
 
+    auth = ('user', 'pass')  # Replace with the actual username and password
+    response = requests.get(f"{OIL_API_URL}?key={key}", headers=request.headers, auth=auth)
 
+    print(f"Response from Count-fakeula API: {response.status_code}, {response.text}")  # Debug log
 
+    # Handle non-JSON responses
+    if response.headers.get('Content-Type') == 'application/json':
+        return jsonify(response.json()), response.status_code
+    else:
+        return jsonify({"error": response.text}), response.status_code
+        
 IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
 auth = ('user', 'pass')
 OUTPUT_FILE = "output.txt"

@@ -67,6 +67,13 @@ class AssetDB(AuthenticatedResource):
 
     # Search the OIL redis database and return the value of any key found.
     def oil_search(self, redis=None, sources=[], keys=[], schema=None):
+        for source in sources:
+          for key in keys:
+              combined_key = ':'.join([source, key])
+              print(f"Checking combined_key: {combined_key}")  # Debug log
+              if combined_key in self.dummy_lookup_table:
+                  data.append(self.dummy_lookup_table[combined_key])
+        
         data = []
         for key in keys:
             if key.lower() == "server" or key.lower() == "server.example.com" or key == "10.0.0.1":

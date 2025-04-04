@@ -1,7 +1,7 @@
 import json
 import redis
 
-from flask import request
+from flask import Flask, request, jsonify
 from flask_restful import reqparse
 from .auth import AuthenticatedResource
 

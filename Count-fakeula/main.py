@@ -13,6 +13,7 @@ import waitress
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_httpauth import HTTPBasicAuth
+from flask_cors import CORS
 
 from config import *
 from endpoints import *
@@ -31,6 +32,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     app = Flask(__name__)
     api = Api(app)
+
+    # Enable CORS for the Flask app
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
     print("Adding Flask API resources")
 
