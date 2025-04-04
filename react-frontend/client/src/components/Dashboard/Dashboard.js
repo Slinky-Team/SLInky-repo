@@ -103,8 +103,37 @@ const Dashboard = () => {
     }
   };
 
-  const handleFangedDefangedChange = (e) => {
-    setFangedDefanged(e.target.value);
+  const handleFangedDefangedChange = async (e) => {
+    console.log(e.target.value);
+
+    let processedInput = inputText.trim();
+    var fang_value = e.target.value;
+
+    if (fang_value == 'fanged' || fang_value == 'defanged') {
+      try {
+        const fangResponse = await fetch(`/fanging?mode=${fang_value}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: processedInput,
+        });
+      
+        if (!fangResponse.ok) {
+          throw new Error(`Failed to fang/defang: ${await fangResponse.text()}`);
+        }
+
+        // Receive the raw fanged/defanged text
+        const modifedText = await fangResponse.text();
+        console.log("Modified Text:", modifedText);
+
+        // Update inputText with the modified text from the response
+        setInputText(modifedText);
+        
+      } catch (error) {
+        console.error('Fanging/defanging failed:', error);
+      }
+    }
+
+    setFangedDefanged(fang_value);
   };
 
   return (

@@ -70,12 +70,10 @@ def login():
 
     # Check if the user exists
     if user == None:
-        print("MSG 1 REACHED!!!!!!!!!!")
         return jsonify({"message": "Invalid credentials!"}), 401
 
     # Check if the password is correct
     if not check_password_hash(user.password, data['password']):
-        print("MSG 2 REACHED!!!!!!!!!!")
         return jsonify({"message": "Invalid credentials!"}), 401
 
     # If user is valid, proceed with login
@@ -95,6 +93,68 @@ def dashboard():
 def logout():
     session.pop('user_id', None)  # Clear the session manually
     return jsonify({"message": "Logged out successfully!"}), 200
+
+
+# fang/defang route
+@app.route('/fanging', methods=["POST"])
+def fang_defang():
+    try:
+        # Get the mode from the query parameter & input text as raw text
+        mode = request.args.get("mode")
+        input_text = request.get_data(as_text=True)
+
+        print(f"Mode: {mode}")
+        print(f"Input text:\n{input_text}")
+
+
+        # Method to fang ioc
+        def fang(ioc):
+            # Turn www[dot]site[dot]com into www.site.com
+            ioc = ioc.replace("[dot]", ".")
+            # Turn www(dot)site(dot)com into www.site.com
+            ioc = ioc.replace("(dot)", ".")
+            # Turn 1.2.3[,]4 into 1.2.3.4
+            ioc = ioc.replace("[,]", ".")
+            # Turn http[:]// into http://
+            ioc = ioc.replace("[:]", ":")
+            # Turn 1.2.3[.]4 into 1.2.3.4
+            ioc = ioc.replace("[.]", ".")
+            # Turn bad.guy .com into bad.guy.com
+            ioc = ioc.replace(" .", ".")
+            # Turn hxxp into http
+            ioc = ioc.replace("hxxp", "http")
+            return ioc
+        
+        # Method to defang ioc
+        def defang(ioc):
+            # Turn 1.2.3.4 into 1[.]2[.]3[.]4
+            ioc = ioc.replace(".", "[.]")
+            # Turn http:// into http[:]//
+            ioc = ioc.replace(":", "[:]")
+            # Turn 1.2.3[[.]]4 into 1[.]2[.]3[.]4
+            ioc = ioc.replace("[[.]]", "[.]")
+            # Turn http[[:]]// into http[:]//
+            ioc = ioc.replace("[[:]]", "[:]")
+            # Turn http into hxxp
+            ioc = ioc.replace("http", "hxxp")
+            return ioc
+        
+        # For each ioc fang/defang as needed
+        output_lines = []
+        for line in input_text.splitlines():
+            if mode == "fanged":
+                output_lines.append(fang(line))
+            elif mode == "defanged":
+                output_lines.append(defang(line))
+            else:
+                output_lines.append(line)  # No change if mode is invalid
+
+        # return results
+        return "\n".join(output_lines), 200
+    except Exception as e:
+        print(f"FAILED FANGING API: {e}")
+        return "Error processing text", 500
+
 
 OIL_API_URL = "http://127.0.0.1:5000/oil"
 
