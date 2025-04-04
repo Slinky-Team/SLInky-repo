@@ -166,6 +166,7 @@ const Dashboard = () => {
           </div>
           <div className="search-box">
             <textarea
+              className={fangedDefanged == 'fanged' ? 'glowing-border' : 'non-glowing-border'}
               placeholder="Enter IP or Hostname..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
