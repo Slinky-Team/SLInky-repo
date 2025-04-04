@@ -96,8 +96,39 @@ def logout():
     session.pop('user_id', None)  # Clear the session manually
     return jsonify({"message": "Logged out successfully!"}), 200
 
+GEO_URL = "http://127.0.0.1:5000/geo/"
+auth = ('user', 'pass')
 
+@app.route("/geo", methods=['POST'])
+def geo_lookup():
+    print("Reached geo API")
+    text = request.get_data(as_text=True)
 
+    try:
+        # Call geo API with the file content
+        response = requests.post(
+            GEO_URL + text,
+            headers={"Content-Type": "text/plain"},
+            auth=auth,
+            data=text  # Send contents of text
+        )
+
+        if response.status_code == 200:
+            geo_data = response.json()
+            print('REACHED!!!!!!!!!!!!!!!!!!')
+            print(geo_data)
+            return jsonify(geo_data), 200
+        else:
+            return jsonify({
+                "error": "Geo API request failed",
+                "status_code": response.status_code,
+                "response": response.text  # Include API response for debugging
+            }), response.status_code
+    except requests.RequestException as e:
+        return jsonify({"error": f"Request to Geo API failed: {str(e)}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
 
 
 IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"

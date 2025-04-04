@@ -6,6 +6,7 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [inputText, setInputText] = useState('');
   const [results, setResults] = useState([]);
+  const [geo_results, setGeoResults] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [fangedDefanged, setFangedDefanged] = useState('defanged');
   const navigate = useNavigate();
@@ -47,8 +48,8 @@ const Dashboard = () => {
       if (!response.ok) {
         throw new Error(`API returned ${response.status}: ${await response.text()}`);
       }
-
-      const data = await response.json();
+      
+      const data = await response.json();      
 
       // Format the result into a single entry (since IOC endpoint handles everything)
       const searchResult = {
@@ -59,6 +60,58 @@ const Dashboard = () => {
         status: 'Completed',
       };
 
+
+
+      // console.log(searchResult.data[0]?.threat?.indicator?.type)
+      if (searchResult.data[0]?.threat?.indicator?.type == 'ipv4-addr') {
+        console.log("Checkpoint1")     
+        try {
+          const ip = searchResult.data[0].threat.indicator.ip;
+          console.log(`Reached here ${ip}`)
+          
+          setGeoResults([{ id: 'loading', status: 'Fetching GeoIP data...', data: {} }]);
+      
+          // Call the GeoIP API
+          const response = await fetch('/geo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: ip,
+            credentials: 'include',
+          });
+      
+          if (!response.ok) {
+            throw new Error(`Geo API returned ${response.status}: ${await response.text()}`);
+          }
+      
+          const geoData = await response.json();
+
+          // Format results
+          // Can modify this as needed
+          setGeoResults([
+            {
+              id: Date.now().toString(),
+              ip: inputText.trim(),
+              timestamp: new Date().toISOString(),
+              data: geoData.data, // Parsed JSON response
+              status: 'Completed',
+            },
+          ]);
+      
+        } catch (error) {
+          console.error('GeoIP lookup error:', error);
+          setGeoResults([
+            {
+              id: 'error',
+              status: 'Error',
+              error: error.message || 'Failed to fetch GeoIP data',
+              data: {},
+            },
+          ]);
+        }     
+      }
+
+
+
       // Save to backend history
       await fetch('/api/search-history', {
         method: 'POST',
@@ -68,6 +121,7 @@ const Dashboard = () => {
       });
 
       setResults([searchResult]);
+      // console.log(searchResult.data[0]?.threat?.indicator?.type)
 
     } catch (error) {
       console.error('Search error:', error);
@@ -162,6 +216,10 @@ const Dashboard = () => {
             </div>
             <div className="results-box">
               <SearchResultsList results={results} />
+              <div className="geo-json-box">
+                <h3>Geo API JSON Response:</h3>
+                <pre>{JSON.stringify(geo_results, null, 2)}</pre>
+              </div>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@ class GeoIP(AuthenticatedResource):
         # Otherwise, handle it like a normal request where we expect form data.
         if request.content_type != 'text/plain':
             return self.get(ip)
-
+        
         # Bulk mode
         parser = reqparse.RequestParser()
         parser.add_argument('raw', default=None, location="args")
