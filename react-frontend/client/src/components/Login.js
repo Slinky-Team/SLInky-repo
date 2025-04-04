@@ -26,7 +26,7 @@ function Login({ onLogin, theme }) {
       if (response.ok) {
         const data = await response.json();
         onLogin({ username });
-        navigate("/");
+        navigate("/dashboard");
       } else {
         setError("Invalid username or password");
       }
