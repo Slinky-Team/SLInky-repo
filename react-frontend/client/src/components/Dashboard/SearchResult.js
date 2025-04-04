@@ -20,10 +20,10 @@ export const SearchResult = ({ result }) => {
   const renderTable = (data) => {
     if (!Array.isArray(data)) return null;
 
-    // Extract headers dynamically from all objects in the array
+    // Extract headers dynamically from all objects in the array, excluding "client"
     const headers = Array.from(
       new Set(data.flatMap((item) => Object.keys(item)))
-    );
+    ).filter((header) => header !== 'client' && header !== 'testMsg'); // Exclude "client"
 
     return (
       <div className="table-container">
