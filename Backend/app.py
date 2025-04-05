@@ -251,32 +251,32 @@ def check_iocs_against_endpoints(ioc_map):
         # Determine endpoints based on the IOC type
         if ioc_type in ("ipv4-addr", "ipv6-addr"):
             endpoints = [
-                f"{BASE_URL}/oil",      # Oil endpoint for threat intel on IPs
-                f"{BASE_URL}/pdns",     # Passive DNS lookup
-                f"{BASE_URL}/cbr",      # Carbon Black Response for additional context
-                f"{BASE_URL}/vpn"       # VPN/Proxy check, if applicable
+                f"{BASE_URL}/oil",      
+                f"{BASE_URL}/pdns",    
+                f"{BASE_URL}/cbr",      
+                f"{BASE_URL}/vpn"       
             ]
         elif ioc_type == "domain-name":
             endpoints = [
-                f"{BASE_URL}/pdns",              # Passive DNS lookup for domain history
-                f"{BASE_URL}/ldap",              # LDAP lookup for asset or user info
-                f"{BASE_URL}/asset"              # Asset inventory endpoint, if available
+                f"{BASE_URL}/pdns",              
+                f"{BASE_URL}/ldap",              
+                f"{BASE_URL}/asset"              
             ]
         elif ioc_type == "url":
             endpoints = [
-                f"{BASE_URL}/oil"        # A dedicated URL-checking endpoint
+                f"{BASE_URL}/oil"        
             ]
         elif ioc_type == "email-addr":
             endpoints = [
-                f"{BASE_URL}/oil/email"      # Email address validation and threat intel
+                f"{BASE_URL}/oil/email"     
             ]
         elif ioc_type == "file":
             endpoints = [
-                f"{BASE_URL}/cbr/binary/"        # Endpoint for checking file hashes
+                f"{BASE_URL}/cbr/binary/"        
             ]
         elif ioc_type == "user-account":
             endpoints = [
-                f"{BASE_URL}/ldap"           # LDAP lookup for user accounts
+                f"{BASE_URL}/ldap"           
             ]
         else:
             endpoints = []
@@ -284,12 +284,11 @@ def check_iocs_against_endpoints(ioc_map):
         # For each endpoint, make a call and store the result
         for endpoint in endpoints:
             try:
-                # Construct the HTTP GET call; adjust the parameter name ("key") as needed.
                 url = f"{endpoint}/{ioc_value}"
                 resp = requests.get(url, auth=auth,timeout=5)
                 print(f"Response from {endpoint}: {resp.status_code}")  # Debug log
                 if resp.status_code == 200:
-                    data = resp.json()  # Sponsor's API response
+                    data = resp.json()  
                     results[ioc_value].append({
                         "source": endpoint,
                         "hit": True,
