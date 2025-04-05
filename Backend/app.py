@@ -174,39 +174,146 @@ def proxy_oil_request():
     else:
         return jsonify({"error": response.text}), response.status_code
         
-IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
+IOC_EXTRACTOR_URL = "http://127.0.0.1:7001/extract"
 auth = ('user', 'pass')
 OUTPUT_FILE = "output.txt"
 
 @app.route("/search-and-extract", methods=["POST"])
 def search_and_extract():
     text = request.get_data(as_text=True)
+    ioc_map = {}
 
     try:
-        # Save the text to output.txt
+        # Save text to output.txt
         with open(OUTPUT_FILE, "w") as file:
             file.write(text)
 
-        # Read the contents of output.txt
+        # Read file contents
         with open(OUTPUT_FILE, "r") as file:
             file_content = file.read()
 
-        # Call the IOC extraction API with the file content
+        # Call the IOC extraction API
         response = requests.post(
             IOC_EXTRACTOR_URL,
             headers={"Content-Type": "text/plain"},
             auth=auth,
-            data=file_content  # Send contents of output.txt
+            data=file_content
         )
 
         if response.status_code == 200:
             ioc_data = response.json()
-            return jsonify(ioc_data), 200
+            print(ioc_data)  # Debug
+
+            for item in ioc_data.get("data", []):
+                threat = item.get("threat", {})
+                indicator = threat.get("indicator", {})
+                ioc_type = indicator.get("type")
+
+                # Extract key based on type
+                if ioc_type in ("ipv4-addr", "ipv6-addr"):
+                    key = indicator.get("ip")
+                elif ioc_type == "domain-name":
+                    key = indicator.get("domain-name")
+                elif ioc_type == "url":
+                    key = indicator.get("url")
+                elif ioc_type == "file":
+                    hash_info = indicator.get("file", {}).get("hash", {})
+                    key = hash_info.get("sha256") or hash_info.get("md5")
+                elif ioc_type == "user-account":
+                    key = indicator.get("user-account")
+                elif ioc_type == "email-addr":
+                    key = indicator.get("email", {}).get("address")
+
+                if key:
+                    ioc_map[key] = {
+                        "type": ioc_type,
+                        "data": indicator
+                    }
+
+            final_results = check_iocs_against_endpoints(ioc_map)
+            return jsonify(final_results), 200
         else:
             return jsonify({"error": "IOC extraction failed"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def check_iocs_against_endpoints(ioc_map):
+    results = {}
+
+    for ioc_value, details in ioc_map.items():
+        results[ioc_value] = []  # Prepare a list to hold responses
+        ioc_type = details["type"]
+
+        BASE_URL = "http://127.0.0.1:7001"
+
+        # Determine endpoints based on the IOC type
+        if ioc_type in ("ipv4-addr", "ipv6-addr"):
+            endpoints = [
+                f"{BASE_URL}/oil",      # Oil endpoint for threat intel on IPs
+                f"{BASE_URL}/pdns",     # Passive DNS lookup
+                f"{BASE_URL}/cbr",      # Carbon Black Response for additional context
+                f"{BASE_URL}/vpn"       # VPN/Proxy check, if applicable
+            ]
+        elif ioc_type == "domain-name":
+            endpoints = [
+                f"{BASE_URL}/pdns",              # Passive DNS lookup for domain history
+                f"{BASE_URL}/ldap",              # LDAP lookup for asset or user info
+                f"{BASE_URL}/asset"              # Asset inventory endpoint, if available
+            ]
+        elif ioc_type == "url":
+            endpoints = [
+                f"{BASE_URL}/oil"        # A dedicated URL-checking endpoint
+            ]
+        elif ioc_type == "email-addr":
+            endpoints = [
+                f"{BASE_URL}/oil/email"      # Email address validation and threat intel
+            ]
+        elif ioc_type == "file":
+            endpoints = [
+                f"{BASE_URL}/cbr/binary/"        # Endpoint for checking file hashes
+            ]
+        elif ioc_type == "user-account":
+            endpoints = [
+                f"{BASE_URL}/ldap"           # LDAP lookup for user accounts
+            ]
+        else:
+            endpoints = []
+
+        # For each endpoint, make a call and store the result
+        for endpoint in endpoints:
+            try:
+                # Construct the HTTP GET call; adjust the parameter name ("key") as needed.
+                url = f"{endpoint}/{ioc_value}"
+                resp = requests.get(url, auth=auth,timeout=5)
+                print(f"Response from {endpoint}: {resp.status_code}")  # Debug log
+                if resp.status_code == 200:
+                    data = resp.json()  # Sponsor's API response
+                    results[ioc_value].append({
+                        "source": endpoint,
+                        "hit": True,
+                        "data": data
+                    })
+                else:
+                    results[ioc_value].append({
+                        "source": endpoint,
+                        "hit": False,
+                        "data": None,
+                        "error": f"HTTP {resp.status_code}"
+                    })
+            except Exception as e:
+                results[ioc_value].append({
+                    "source": endpoint,
+                    "hit": False,
+                    "error": str(e)
+                })
+                
+
+    print(f"Final results: {json.dumps(results, indent=2)}")  # Debug log
+    # Return the results for all IOCs
+    return results
+
 
 # Add a route to save search history
 @app.route('/api/search-history', methods=['POST', 'OPTIONS'])
