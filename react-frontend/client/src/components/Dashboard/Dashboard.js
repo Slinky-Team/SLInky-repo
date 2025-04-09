@@ -109,7 +109,7 @@ const Dashboard = () => {
     let processedInput = inputText.trim();
     var fang_value = e.target.value;
 
-    if (fang_value == 'fanged' || fang_value == 'defanged') {
+    if (fang_value === 'fanged' || fang_value === 'defanged') {
       try {
         const fangResponse = await fetch(`/fanging?mode=${fang_value}`, {
           method: 'POST',
@@ -166,7 +166,7 @@ const Dashboard = () => {
           </div>
           <div className="search-box">
             <textarea
-              className={fangedDefanged == 'fanged' ? 'glowing-border' : 'non-glowing-border'}
+              className={fangedDefanged === 'fanged' ? 'glowing-border' : 'non-glowing-border'}
               placeholder="Enter IP or Hostname..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}

@@ -1,0 +1,95 @@
+.home-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #00ADFA, #01D34C);
+    background-size: 200% 200%; /* Makes the gradient larger than the container */
+    animation: gradient-animation 6s ease infinite; /* Applies the animation */
+    font-family: 'Roboto Medium', system-ui, sans-serif;
+  }
+  
+  /* Keyframes for the gradient animation */
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%; /* Start position */
+    }
+    50% {
+      background-position: 100% 50%; /* Middle position */
+    }
+    100% {
+      background-position: 0% 50%; /* End position */
+    }
+  }
+  
+  .home-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 600px;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    text-align: center;
+  }
+  
+  .home-header h1 {
+    color: #212529;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  
+  .home-header p {
+    color: #6c757d;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .home-buttons .btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .home-buttons .btn-success {
+    background: linear-gradient(135deg, #01D34C 0%, #37b24d 100%);
+    color: white;
+    border: none;
+  }
+  
+  .home-buttons .btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(55, 178, 77, 0.25);
+  }
+  
+  .home-buttons .btn-primary {
+    background: linear-gradient(135deg, #00ADFA 0%, #228be6 100%);
+    color: white;
+    border: none;
+  }
+  
+  .home-buttons .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(34, 139, 230, 0.25);
+  }
+  
+  @media (max-width: 480px) {
+    .home-card {
+      padding: 2rem;
+      margin: 1rem;
+    }
+  
+    .home-header h1 {
+      font-size: 2rem;
+    }
+  }
