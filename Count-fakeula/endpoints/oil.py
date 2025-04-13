@@ -25,7 +25,7 @@ class Oil(AuthenticatedResource):
     def __init__(self, oil_conf=[]):
         dummy_data = json.loads("""
 [
-    {"callerIpAddress":"1.2.3.4","coxAccountName":"abob","userPrincipalName":"alice.bob@example.com","userDisplayName":"Alice Bob","displayName":"laptop1","client":{"as_org":"ASN-ACME","ip":"1.2.3.4","asn":1234},"timestamp":"2025-01-23T21:15:51.439Z","key":"1.2.3.4","oil":"azure","testMsg":"Yipee!!"},
+    {"callerIpAddress":"1.2.3.4","coxAccountName":"abob","userPrincipalName":"alice.bob@example.com","userDisplayName":"Alice Bob","displayName":"laptop1","client":{"as_org":"ASN-ACME","ip":"1.2.3.4","asn":1234},"timestamp":"2025-01-23T21:15:51.439Z","key":"1.2.3.4","oil":"azure"},
     {"callerIpAddress":"1.2.3.4","coxAccountName":"abob","userPrincipalName":"alice.bob@example.com","userDisplayName":"Alice Bob","displayName":"laptop1","client":{"as_org":"ASN-ACME","ip":"1.2.3.4","asn":1234},"timestamp":"2025-01-23T21:15:51.439Z","key":"abob","oil":"azure"},
     {"callerIpAddress":"1.2.3.4","coxAccountName":"abob","userPrincipalName":"alice.bob@example.com","userDisplayName":"Alice Bob","displayName":"laptop1","client":{"as_org":"ASN-ACME","ip":"1.2.3.4","asn":1234},"timestamp":"2025-01-23T21:15:51.439Z","key":"alice.bob@example.com","oil":"azure"},
     {"event":{"start":"2025-01-23T21:12:52.566Z","type":"access","module":"azure","outcome":"success","category":"authentication"},"@timestamp":"2025-01-23T21:12:52.566Z","user":{"full_name":"Alice Bob","email":"alice.bob@example.com","name":"abob"},"host":{"os":{"family":"Windows10"},"name":"laptop1"},"source":{"ip":"1.2.3.4"},"megaoil":{"pipeline":"coxsight"},"timestamp":"2025-01-23T21:12:52.566Z","key":"1.2.3.4","oil":"coxsight"},

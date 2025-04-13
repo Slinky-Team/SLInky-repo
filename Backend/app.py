@@ -174,7 +174,7 @@ def proxy_oil_request():
     else:
         return jsonify({"error": response.text}), response.status_code
         
-IOC_EXTRACTOR_URL = "http://127.0.0.1:7001/extract"
+IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
 auth = ('user', 'pass')
 OUTPUT_FILE = "output.txt"
 
@@ -202,7 +202,7 @@ def search_and_extract():
 
         if response.status_code == 200:
             ioc_data = response.json()
-            print(ioc_data)  # Debug
+            # print(f'ioc_data == {ioc_data}')  # Debug
 
             for item in ioc_data.get("data", []):
                 threat = item.get("threat", {})
@@ -231,6 +231,9 @@ def search_and_extract():
                     }
 
             final_results = check_iocs_against_endpoints(ioc_map)
+            # print(f"Final_Results: {type(final_results)}")
+            # print(f"Final_Results: {final_results}")
+
             return jsonify(final_results), 200
         else:
             return jsonify({"error": "IOC extraction failed"}), 500
@@ -246,7 +249,7 @@ def check_iocs_against_endpoints(ioc_map):
         results[ioc_value] = []  # Prepare a list to hold responses
         ioc_type = details["type"]
 
-        BASE_URL = "http://127.0.0.1:7001"
+        BASE_URL = "http://127.0.0.1:5000"
 
         # Determine endpoints based on the IOC type
         if ioc_type in ("ipv4-addr", "ipv6-addr"):
@@ -309,7 +312,7 @@ def check_iocs_against_endpoints(ioc_map):
                 })
                 
 
-    print(f"Final results: {json.dumps(results, indent=2)}")  # Debug log
+    # print(f"Final results: {json.dumps(results, indent=2)}")  # Debug log
     # Return the results for all IOCs
     return results
 

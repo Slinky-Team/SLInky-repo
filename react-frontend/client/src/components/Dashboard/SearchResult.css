@@ -14,15 +14,18 @@
   .result-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    table-layout: auto;
   }
   
   .result-table th,
   .result-table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 4px 8px;
     text-align: left;
     vertical-align: top;
+    min-width: 140px;
+    max-width: 300px;
   }
   
   .result-table th {
@@ -32,6 +35,7 @@
   
   .table-container {
     overflow-x: auto; /* Enable horizontal scrolling */
+    margin-top: 1rem;
   }
   
   .nested-object {
@@ -40,5 +44,7 @@
     padding: 5px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+    font-family: monospace;
+    margin: 0;
   }

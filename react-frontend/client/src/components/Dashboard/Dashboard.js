@@ -49,47 +49,59 @@ const Dashboard = () => {
   
       const data = await response.json();
       console.log('Raw data from /search-and-extract:', data);
+
+      // Update the results with the oil processing output
+      setResults(prevResults => [
+        ...prevResults,
+        {
+          id: Date.now().toString(),
+          query: inputText.trim(),
+          timestamp: new Date().toISOString(),
+          data: data || [], // Ensure `data` is an array
+          status: 'Completed',
+        },
+      ]);
   
-      // Step 2: Extract keys from the response
-      const processedKeys = data.data?.map(item => item.threat?.indicator?.description); // Extract the "description" field as the key
-      console.log('Extracted keys:', processedKeys);
+      // // Step 2: Extract keys from the response
+      // const processedKeys = data.data?.map(item => item.threat?.indicator?.description); // Extract the "description" field as the key
+      // console.log('Extracted keys:', processedKeys);
   
-      // Ensure the keys are unique
-      const uniqueKeys = [...new Set(processedKeys)];
+      // // Ensure the keys are unique
+      // const uniqueKeys = [...new Set(processedKeys)];
   
-      if (uniqueKeys.length === 0) {
-        console.error('No valid keys to send to oil.py');
-        return;
-      }
+      // if (uniqueKeys.length === 0) {
+      //   console.error('No valid keys to send to oil.py');
+      //   return;
+      // }
   
-      // Step 3: Call the oil function for each key
-      for (const key of uniqueKeys) {
-        console.log(`Sending request to /oil with key: ${encodeURIComponent(key)}`);
-        const oilResponse = await fetch(`/oil?key=${encodeURIComponent(key)}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
+      // // Step 3: Call the oil function for each key
+      // for (const key of uniqueKeys) {
+      //   console.log(`Sending request to /oil with key: ${encodeURIComponent(key)}`);
+      //   const oilResponse = await fetch(`/oil?key=${encodeURIComponent(key)}`, {
+      //     method: 'GET',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     credentials: 'include',
+      //   });
   
-        if (!oilResponse.ok) {
-          console.error(`Oil API returned ${oilResponse.status}: ${await oilResponse.text()}`);
-        } else {
-          const oilResult = await oilResponse.json();
-          console.log(`Oil processing result for key ${key}:`, oilResult);
+      //   if (!oilResponse.ok) {
+      //     console.error(`Oil API returned ${oilResponse.status}: ${await oilResponse.text()}`);
+      //   } else {
+      //     const oilResult = await oilResponse.json();
+      //     console.log(`Oil processing result for key ${key}:`, oilResult);
   
-          // Update the results with the oil processing output
-          setResults(prevResults => [
-            ...prevResults,
-            {
-              id: Date.now().toString(),
-              query: inputText.trim(),
-              timestamp: new Date().toISOString(),
-              data: oilResult.data || [], // Ensure `data` is an array
-              status: 'Completed',
-            },
-          ]);
-        }
-      }
+      //     // Update the results with the oil processing output
+      //     setResults(prevResults => [
+      //       ...prevResults,
+      //       {
+      //         id: Date.now().toString(),
+      //         query: inputText.trim(),
+      //         timestamp: new Date().toISOString(),
+      //         data: oilResult.data || [], // Ensure `data` is an array
+      //         status: 'Completed',
+      //       },
+      //     ]);
+      //   }
+      // }
     } catch (error) {
       console.error('Search error:', error);
       setResults([

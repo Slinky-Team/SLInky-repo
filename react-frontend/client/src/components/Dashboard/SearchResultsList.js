@@ -2,7 +2,7 @@ import React from 'react';
 import { SearchResult } from './SearchResult';
 
 export const SearchResultsList = ({ results }) => {
-  console.log('Results passed to SearchResultsList:', results);
+  // console.log('Results passed to SearchResultsList:', results);
   if (results.length === 1 && results[0].status === 'Loading...') {
     return <div className="loading-container">Loading results...</div>;
   }
