@@ -5,21 +5,20 @@
     min-height: 100vh;
     padding: 2rem;
     background: linear-gradient(135deg, #00ADFA, #01D34C);
-    background-size: 200% 200%; /* Makes the gradient larger than the container */
-    animation: gradient-animation 6s ease infinite; /* Applies the animation */
+    background-size: 200% 200%;
+    animation: gradient-animation 6s ease infinite;
     font-family: 'Roboto Medium', system-ui, sans-serif;
   }
-  
-  /* Keyframes for the gradient animation */
+
   @keyframes gradient-animation {
     0% {
-      background-position: 0% 50%; /* Start position */
+      background-position: 0% 50%; 
     }
     50% {
-      background-position: 100% 50%; /* Middle position */
+      background-position: 100% 50%;
     }
     100% {
-      background-position: 0% 50%; /* End position */
+      background-position: 0% 50%;
     }
   }
   

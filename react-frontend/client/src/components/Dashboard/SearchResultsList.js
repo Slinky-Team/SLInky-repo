@@ -1,7 +1,7 @@
 import React from 'react';
 import { SearchResult } from './SearchResult';
 
-export const SearchResultsList = ({ results }) => {
+export const SearchResultsList = ({ results, darkMode }) => {
   // console.log('Results passed to SearchResultsList:', results);
   if (results.length === 1 && results[0].status === 'Loading...') {
     return <div className="loading-container">Loading results...</div>;
@@ -21,7 +21,7 @@ export const SearchResultsList = ({ results }) => {
       <h3>Search Results</h3>
       {results.length > 0 ? (
         results.map((result) => (
-          <SearchResult result={result} key={result.id} />
+          <SearchResult result={result} darkMode={darkMode} key={result.id} />
         ))
       ) : (
         <p>No results to display</p>

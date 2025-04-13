@@ -151,7 +151,10 @@ const Dashboard = () => {
   return (
     <div className={`dashboard-container ${darkMode ? 'dark-mode' : ''}`}>
       <header className="dashboard-header">
-        <div className="logo">COX</div>
+        <div className="logo">
+          <img src="slinkyface.png" alt="Logo" className="dark-logo" />
+          <img src="coxlogo.png" alt="Logo" className="light-logo" />
+        </div>
         <h1 className="title">Hyperion</h1>
         <div className="header-links">
           <button className="nav-link" onClick={handleHistory}>
@@ -171,8 +174,8 @@ const Dashboard = () => {
         {/* Left Search Panel */}
         <div className="search-panel">
           <div className="search-header">
-            <h3>Search IP/Hostname</h3>
-            <button className="search-button" onClick={handleSearch}>
+            <h3 className='search-header-text'>Search IP/Hostname</h3>
+            <button className="search-button exempt" onClick={handleSearch}>
               Search
             </button>
           </div>
@@ -218,7 +221,7 @@ const Dashboard = () => {
               <button className="export-button">Export CSV</button>
             </div>
             <div className="results-box">
-              <SearchResultsList results={results} />
+              <SearchResultsList results={results} darkMode={darkMode} />
             </div>
           </div>
         </div>
