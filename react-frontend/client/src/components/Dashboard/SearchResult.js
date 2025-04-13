@@ -316,7 +316,6 @@ export const SearchResult = ({ result, darkMode }) => {
       // you'd probably want to start looking somewhere here first.
       return finalAttributes.map(([key, value], idx) => (
         <div key={idx} className="attribute">
-          <strong>{key}:</strong>
           {typeof value === 'object' && value !== null ? (
             <pre className="nested-object">
               {JSON.stringify(value, null, 2)}
@@ -355,8 +354,14 @@ export const SearchResult = ({ result, darkMode }) => {
                     <div key={idx} className="custom-table-entry">
                       <div className="attributes-grid">{flattenAttributes(entry)}</div>
                       <div className="json-link">
-                        <a href="#" onClick={() => console.log('Full JSON:', entry)}>
-                          View Full JSON
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent default link behavior
+                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
+                          }}
+                        >
+                          Full Pull
                         </a>
                       </div>
                     </div>
@@ -374,9 +379,15 @@ export const SearchResult = ({ result, darkMode }) => {
                       <div key={`netflow-${idx}`} className="custom-table-entry">
                         <div className="attributes-grid">{flattenAttributes(entry)}</div>
                         <div className="json-link">
-                          <a href="#" onClick={() => console.log('Full JSON:', entry)}>
-                            View Full JSON
-                          </a>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent default link behavior
+                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
+                          }}
+                        >
+                          Full Pull
+                        </a>
                         </div>
                       </div>
                     ))}

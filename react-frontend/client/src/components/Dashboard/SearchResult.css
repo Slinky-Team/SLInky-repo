@@ -138,6 +138,7 @@
   width: 100%;
   box-sizing: border-box;
   color: #212529;
+  text-align: center;
 }
 
 .json-link a {
