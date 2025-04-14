@@ -18,7 +18,6 @@ export const SearchResultsList = ({ results, darkMode }) => {
 
   return (
     <div className="results-container">
-      <h3>Search Results</h3>
       {results.length > 0 ? (
         results.map((result) => (
           <SearchResult result={result} darkMode={darkMode} key={result.id} />

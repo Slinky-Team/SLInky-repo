@@ -340,12 +340,12 @@ export const SearchResult = ({ result, darkMode }) => {
           return (
             <div key={ioc} className="custom-table">
               <div className="custom-table-header">
-                <h3>{ioc}</h3>
+                <div>{ioc}</div>
               </div>
               <div className="custom-table-row">
                 {/* Left column: Security logs */}
                 <div className="custom-table-column security-logs">
-                  <strong>Security Logs</strong>
+                  <div>Security Logs</div>
                 </div>
   
                 {/* right column: not-netflow entries */}
@@ -405,13 +405,12 @@ export const SearchResult = ({ result, darkMode }) => {
     <div className={`result-item ${darkMode ? 'dark-mode' : ''}`}>
       <div className="result-header">
         <div className="query-info">
-          <span className="timestamp">
-            {new Date(result.timestamp).toLocaleString()}
+          <span className="timestamp bigger-text">
+            {result.timestamp ? new Date(result.timestamp).toLocaleString() : ''}
           </span>
         </div>
       </div>
       <div className="result-details">
-        <h4>JSON Response</h4>
         {result.data ? (
           typeof result.data === 'object' && result !== null ? (
             renderTable(Object.entries(result.data))

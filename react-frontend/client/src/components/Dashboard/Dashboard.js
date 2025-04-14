@@ -155,16 +155,16 @@ const Dashboard = () => {
           <img src="slinkyface.png" alt="Logo" className="dark-logo" />
           <img src="coxlogo.png" alt="Logo" className="light-logo" />
         </div>
-        <h1 className="title">Hyperion</h1>
+        <h1 className="title">Security Lookup Interface</h1>
         <div className="header-links">
           <button className="nav-link" onClick={handleHistory}>
             History
           </button>
-          <button className="nav-link" onClick={handleSignOut}>
-            Sign Out
-          </button>
           <button className="nav-link" onClick={toggleDarkMode}>
             {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
+          <button className="nav-link" onClick={handleSignOut}>
+            Sign Out
           </button>
         </div>
       </header>
