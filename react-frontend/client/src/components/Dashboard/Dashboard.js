@@ -115,6 +115,116 @@ const Dashboard = () => {
     }
   };
 
+  // Helper to flatten nested objects into dot notation
+  const flattenObject = (obj, depth = 0, rows = []) => {
+    for (const key in obj) {
+      if (!obj.hasOwnProperty(key)) continue;
+  
+      const value = obj[key];
+      const row = new Array(depth).fill("").concat(["", key]);
+  
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        // If value is nested object, recurse deeper
+        flattenObject(value, depth + 1, rows);
+      } else if (Array.isArray(value)) {
+        if (value.length > 0 && typeof value[0] === 'object') {
+          for (const item of value) {
+            flattenObject(item, depth + 1, rows);
+          }
+        } else {
+          // If array of primitives, print each as its own row
+          for (const item of value) {
+            const itemRow = new Array(depth).fill("").concat([item, key]);
+            rows.push(itemRow);
+          }
+        }
+      } else {
+        // Primitive value
+        row[depth] = value;
+        rows.push(row);
+      }
+    }
+  
+    return rows;
+  };
+
+  const handleCsvExport = (data) => {
+
+    if (!data || Object.keys(data).length === 0) {
+      alert('No results to export!');
+      return;
+    }
+
+    const iocs = Object.keys(data[1].data);
+    let iocData = {};
+
+    for (let i=0; i<iocs.length; i++) {
+      let currIocData = data[1].data[iocs[i]];
+
+      console.log(currIocData);
+
+      if (!iocData[iocs[i]]) {
+        iocData[iocs[i]] = [];
+      }
+
+      for (let j=0; j<Object.entries(currIocData).length; j++) {
+        let entry = currIocData[j].data.data; // Get all iocs enpoints entries
+        // console.log(entry);
+
+
+        // Obtain data source (oil, cbr, pdns.. etc.)
+        let source = new URL(currIocData[j].source);
+        source = source.pathname.slice(1);
+
+        if (!iocData[iocs[i]][source]) {
+          iocData[iocs[i]][source] = [];
+        }
+
+        iocData[iocs[i]][source].push(entry);
+
+      }
+    }
+    
+    // ===== CSV Export Begins Here =====
+    let rows = [];
+
+    for (const ioc in iocData) {
+      rows.push(["", "", "", "-----------------------------"]);
+      rows.push(["", "", "", `**** IOC: ${ioc} ****`]); // IOC header
+      rows.push(["", "", "", "-----------------------------"]);
+
+      for (const source in iocData[ioc]) {
+        rows.push(["", "", "", "-----------------------------"]);
+        rows.push(["", "", "", `>>>> Source: ${source} <<<<`]); // Source sub-header
+        rows.push(["", "", "", "-----------------------------"]);
+        rows.push([""]);
+
+        for (const entry of iocData[ioc][source]) {
+          const entryRows = flattenObject(entry);
+          rows.push(...entryRows);
+        }
+
+        rows.push([""]); // blank row between sources
+      }
+
+      rows.push([""]); // blank row between IOCs
+    }
+
+    // Export to CSV
+    const csvContent = rows.map(row =>
+      row.map(col => `"${String(col ?? '').replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'exported_data.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   const handleFangedDefangedChange = async (e) => {
     console.log(e.target.value);
 
@@ -208,7 +318,7 @@ const Dashboard = () => {
                 Fanged
               </label>
             </div>
-            <button className="export-button">Export CSV</button>
+            <button onClick={() => handleCsvExport(results)} className="export-button">Export CSV</button>
           </div>
         </div>
 
@@ -218,7 +328,7 @@ const Dashboard = () => {
           <div className="lookup-container">
             <div className="lookup-header">
               <h3 className="lookup-title">Lookup Results</h3>
-              <button className="export-button">Export CSV</button>
+              <button onClick={() => handleCsvExport(results)} className="export-button">Export CSV</button>
             </div>
             <div className="results-box">
               <SearchResultsList results={results} darkMode={darkMode} />
