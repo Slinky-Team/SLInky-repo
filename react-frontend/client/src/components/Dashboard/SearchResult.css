@@ -206,3 +206,118 @@
   font-size: 1.2rem;
   font-weight: 400;
 }
+.custom-table-row > div,
+.attributes-grid > div,
+.nested-object {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.source-divider {
+  margin: 24px 0 16px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #2e2e2e; /* Dark gray for dark mode vibe */
+  color: #ffffff;
+  border-left: 4px solid #5bc0de; /* Light blue highlight */
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+/* Header container */
+.header-pivot-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Vertical divider between IOC header and pivot links */
+.header-pivot-links::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 60%;
+  width: 1px;
+  background-color: #ddd;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Pivot links container - box styling */
+.pivot-links-box {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Pivot link items */
+.pivot-link {
+  color: #495057;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+  font-size: 0.9rem;
+}
+
+
+/* Pivot link hover effect */
+.pivot-link:hover:not(.active) {
+  background-color: #e9ecef;
+  color: #212529;
+}
+.pivot-link.active:hover {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+
+/* Dark mode styles */
+.dark-mode .header-pivot-links::before {
+  background-color: #444;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .pivot-links-box {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.dark-mode .pivot-link {
+  color: #adb5bd;
+}
+
+.dark-mode .pivot-link.active:hover {
+  color: #ffffff;
+  background-color: #3d3d3d;
+  
+}
+
+.dark-mode .pivot-link:hover:not(.active) {
+  background-color: #3d3d3d;
+  color: #ffffff;
+}
+
+/* IOC header title styling */
+.ioc-header-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #212529;
+  padding-right: 1.5rem;
+}
+
+.dark-mode .ioc-header-title {
+  color: #ffffff;
+}

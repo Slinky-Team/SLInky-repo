@@ -5,7 +5,6 @@ export const SearchResult = ({ result, darkMode }) => {
   console.log('Result passed to SearchResult:', result);
   console.log('Dark mode:', darkMode);
 
-  // Function to render nested objects and arrays
   const renderValue = (value) => {
     if (typeof value === 'object' && value !== null) {
       return (
@@ -17,7 +16,6 @@ export const SearchResult = ({ result, darkMode }) => {
     return value;
   };
 
-  // Function to render the table
   const renderTable = (data) => {
     console.log('Rendering table with current DATA!!!!: ', data);
     if (!Array.isArray(data) || data.length === 0) return null;
@@ -25,91 +23,91 @@ export const SearchResult = ({ result, darkMode }) => {
     let formattedResults = {};
     let keys = [];
 
-    // Loop through each ioc
-    for (let i=0; i<data.length; i++) {
-      const curr_key = data[i][0]; // Get current key
-      let sources = {source: []};
-
+    for (let i = 0; i < data.length; i++) {
+      const curr_key = data[i][0];
       if (!keys.includes(String(curr_key))) {
         keys.push(curr_key);
       }
 
-      // Loop through each result in the current ioc
-      for (let j=0; j<data[i][1].length; j++) {
-        sources.source.push(data[i][1][j].source);
+      if (!formattedResults[curr_key]) {
+        formattedResults[curr_key] = {
+          oil: [],
+          pdns: [],
+          oil_email: null,
+          vpn: null,
+          cbr: null,
+          asset: null
+        };
       }
 
-      for (let j=0; j<sources.source.length; j++) {
-        let endpoint = String(sources.source[j]);
+      for (let j = 0; j < data[i][1].length; j++) {
+        const source = data[i][1][j];
+        const endpoint = source.source;
+        const responseData = source.data?.data || [];
 
-        if (!formattedResults[curr_key]) {
-          formattedResults[curr_key] = {};
-        }
-        
         if (endpoint.includes('oil/email')) {
-          formattedResults[curr_key]['oil_email'] = data[i][1][j].data?.data?.[0] ?? 'No info found';
-        } else if (endpoint.includes('oil')) {
-          formattedResults[curr_key]['oil'] = data[i][1][j].data?.data ?? 'No info found';
+          formattedResults[curr_key].oil_email = responseData[0] ?? 'No info found';
+        } 
+        else if (endpoint.includes('oil')) {
+          const oilData = Array.isArray(responseData) ? responseData : [responseData];
+          formattedResults[curr_key].oil = [
+            ...formattedResults[curr_key].oil,
+            ...oilData
+          ].filter(item => item !== 'No info found');
         }
-        
-        if (endpoint.includes('pdns')) {
-          formattedResults[curr_key]['pdns'] = data[i][1][j].data?.data?.[0]?.dns?.answers ?? 'No info found';
+        else if (endpoint.includes('pdns')) {
+          const pdnsData = responseData[0]?.dns?.answers ?? [];
+          formattedResults[curr_key].pdns = [
+            ...formattedResults[curr_key].pdns,
+            ...(Array.isArray(pdnsData) ? pdnsData : [pdnsData])
+          ];
         }
-        
-        if (endpoint.includes('cbr')) {
-          formattedResults[curr_key]['cbr'] = data[i][1][j].data?.data?.[0] ?? 'No info found';
+        else if (endpoint.includes('vpn')) {
+          formattedResults[curr_key].vpn = responseData[0] ?? {};
         }
-        
-        if (endpoint.includes('vpn')) {
-          formattedResults[curr_key]['vpn'] = data[i][1][j].data?.data?.[0] ?? 'No info found';
+        else if (endpoint.includes('cbr')) {
+          formattedResults[curr_key].cbr = responseData[0] ?? {};
         }
-        
-        if (endpoint.includes('asset')) {
-          // Route for obtaining asset data is probably wrong: Fix later!!!
-          formattedResults[curr_key]['asset'] = data[i][1][j].data?.data?.[0] ?? 'No info found';
+        else if (endpoint.includes('asset')) {
+          formattedResults[curr_key].asset = responseData[0] ?? {};
         }
       }
     }
 
-    console.log('Results: ', formattedResults);
-
-    // Get all unique keys
-    const allSources = ['oil_email', 'oil', 'pdns', 'cbr', 'vpn', 'asset'];
-
-    return <OilTable data={formattedResults} keys={keys} />;
+    return (
+      <div className={`custom-table-container ${darkMode ? 'dark-mode' : ''}`}>
+        {keys.map((ioc) => {
+          const iocData = formattedResults[ioc] || {};
+          return (
+            <OilTable
+              key={ioc}
+              ioc={ioc}
+              oil={Array.isArray(iocData.oil) ? iocData.oil : []}
+              pdns={Array.isArray(iocData.pdns) ? iocData.pdns : []}
+              vpn={iocData.vpn || {}}
+              cbr={iocData.cbr || {}}
+              asset={iocData.asset || {}}
+              darkMode={darkMode}
+            />
+          );
+        })}
+      </div>
+    );
   };
 
-  const OilTable = ({ data, keys }) => {
-    //this formats the timestamp that oil gives it into a date
+  const OilTable = ({ ioc, oil, pdns, vpn, cbr, asset, darkMode }) => {
     const formatForDate = (timestamp) => {
-      // Parse the string timestamp into a Date object
       const date = new Date(timestamp);
-    
-      // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid Date'; // Handle invalid timestamps gracefully
-      }
-    
-      // Format the date into a readable string
-      return date.toLocaleString('en-US', {
+      return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
     };
 
-    //this formats the timestamp that oil gives it into a TIME aka removes date
     const formatForTime = (timestamp) => {
-      // parse the string timestamp into a date object
       const date = new Date(timestamp);
-    
-      // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid Date'; // Handle invalid timestamps gracefully
-      }
-    
-      // Format the date into a readable string
-      return date.toLocaleString('en-US', {
+      return isNaN(date.getTime()) ? 'Invalid Date' : date.toLocaleString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
@@ -118,29 +116,10 @@ export const SearchResult = ({ result, darkMode }) => {
     };
 
     const flattenAttributes = (entry) => {
-      // List of attributes to exclude
       const excludedAttributes = ['callerIpAddress', 'client', 'megaoil'];
-    
-      // Filter out excluded attributes
       const attributes = Object.entries(entry || {})
         .filter(([key]) => !excludedAttributes.includes(key));
 
-      const formatForDate = (timestamp) => {
-            // Parse the string timestamp into a Date object
-            const date = new Date(timestamp);
-          
-            // Check if the date is valid
-            if (isNaN(date.getTime())) {
-              return 'Invalid Date'; // Handle invalid timestamps gracefully
-            }
-          
-            // Format the date into a readable string
-            return date.toLocaleString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            });
-          };  
 
       // Prioritize specific attributes
       // THIS IS THE PART TO COPY WHEN ADDING NEW ENDPOINTS
@@ -411,191 +390,144 @@ export const SearchResult = ({ result, darkMode }) => {
         }
       });
     
-      finalAttributes = Array.from({ length: 8 }, (_, idx) => finalAttributes[idx] || ['-', '']);
     
-      // render attributes in the 2x4 grid
-      // if you want to make the value turn red if the value matches the key
-      // you'd probably want to start looking somewhere here first.
-      return finalAttributes.map(([key, value], idx) => (
-        <div key={idx} className="attribute">
-          {typeof value === 'object' && value !== null ? (
-            <pre className="nested-object">
-              {JSON.stringify(value, null, 2)}
-            </pre>
-          ) : (
-            String(value)
-          )}
-        </div>
+      return Array.from({ length: 8 }, (_, idx) => finalAttributes[idx] || ['-', ''])
+        .map(([key, value], idx) => (
+          <div key={idx} className="attribute">
+            {typeof value === 'object' ? (
+              <pre className="nested-object">{JSON.stringify(value, null, 2)}</pre>
+            ) : String(value)}
+          </div>
+        ));
+    };
+
+    const generatePivotLinks = (currentIoc) => {
+      const isIP = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(currentIoc);
+      const isDomain = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/.test(currentIoc);
+      const encodedIoc = encodeURIComponent(currentIoc);
+
+
+      const services = [
+        {
+          name: 'Shodan',
+          url: `https://www.shodan.io/search?query=${encodedIoc}`,
+          show: isIP
+        },
+        {
+          name: 'VirusTotal',
+          url: `https://www.virustotal.com/gui/search/${encodedIoc}`,
+          show: true
+        },
+        {
+          name: 'Censys',
+          url: `https://search.censys.io/hosts/${encodedIoc}`,
+          show: isIP
+        },
+        {
+          name: 'IP2Proxy',
+          url: `https://www.ip2location.com/demo/${encodedIoc}`,
+          show: isIP
+        },
+        {
+          name: 'GeoIP',
+          url: `https://geoiplookup.io/ip/${encodedIoc}`,
+          show: isIP
+        },
+        {
+          name: 'Spur',
+          url: `https://spur.us/context/${encodedIoc}`,
+          show: isIP
+        },
+        {
+          name: 'PassiveDNS',
+          url: `https://api.passivedns.io/dns/${encodedIoc}`,
+          show: isDomain
+        }
+      ];
+
+      return services.filter(service => service.show).map((service, idx) => (
+        <a
+      key={idx}
+      href={service.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`pivot-link ${service.name === 'VirusTotal' ? 'active' : ''}`} // Example active state
+    >
+      {service.name}
+    </a>
       ));
     };
-  
-    return (
-      <div className={`custom-table-container ${darkMode ? 'dark-mode' : ''}`}>
-        {keys.map((ioc) => {
-          const oilEntries = data[ioc]?.oil;
-          if (!oilEntries || oilEntries.length === 0) return null;
 
-          const pdnsEntries = data[ioc]?.pdns;
-          if (!pdnsEntries || pdnsEntries.length === 0) return null;
-
-          const vpnEntries = data[ioc]?.vpn;
-          if (!vpnEntries || vpnEntries.length === 0) return null;
-
-          const cbrEntries = data[ioc]?.cbr;
-          if (!cbrEntries || cbrEntries.length === 0) return null;
-
-          console.log('VPN entries: ', cbrEntries);
-          // console.log('VPN entries: ', vpnEntries.length);
-          
-          let netflowEntries = [];
-          let otherEntries = [];
-
-          // separate entries if they're netflow
-          if (oilEntries !== null && Array.isArray(oilEntries)) {
-            netflowEntries = oilEntries.filter((entry) => entry.oil === 'netflow');
-            otherEntries = oilEntries.filter((entry) => entry.oil !== 'netflow');
-          }
-
-          return (
-            <div key={ioc} className="custom-table">
-              <div className="custom-table-header">
-                <div>{ioc}</div>
-              </div>
-              <div className="custom-table-row">
-                {/* Left column: Security logs */}
-                <div className="custom-table-column security-logs">
-                  <div>Security Logs</div>
-                </div>
-  
-                {/* right column: not-netflow entries */}
-                {/* Oil Logs */}
-                <div className="custom-table-column entries-container">
-                  {(otherEntries || []).map((entry, idx) => (
-                    <div key={idx} className="custom-table-entry">
-                      <div className="attributes-grid">{flattenAttributes(entry)}</div>
-                      <div className="json-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent default link behavior
-                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
-                          }}
-                        >
-                          Full Pull
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+    const renderArraySection = (title, data) => {
+      if (!Array.isArray(data) || data.length === 0) return null;
+      
+      return (
+        <div className="custom-table-row">
+          <div className="custom-table-column security-logs">
+            <div>{title}</div>
+          </div>
+          <div className="custom-table-column entries-container">
+            {data.map((entry, idx) => (
+              <div key={idx} className="custom-table-entry">
+                <div className="attributes-grid">{flattenAttributes(entry)}</div>
+                <div className="json-link">
+                  <a href="#" onClick={(e) => {
+                    e.preventDefault();
+                    alert(JSON.stringify(entry, null, 2));
+                  }}>
+                    Full Pull
+                  </a>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
 
-              {/* Netflow Logs*/}
-              {netflowEntries.length > 0 && (
-                <div className="custom-table-row">
-                  <div className="custom-table-column security-logs">
-                    <div>Netflow</div>
-                  </div>
-                  <div className="custom-table-column entries-container">
-                    {netflowEntries.map((entry, idx) => (
-                      <div key={`netflow-${idx}`} className="custom-table-entry">
-                        <div className="attributes-grid">{flattenAttributes(entry)}</div>
-                        <div className="json-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent default link behavior
-                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
-                          }}
-                        >
-                          Full Pull
-                        </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+    const renderObjectSection = (title, data) => {
+      if (!data || typeof data !== 'object' || Object.keys(data).length === 0) return null;
 
-              {/* PDNS Logs */}
-              {pdnsEntries.length > 0 && (
-                <div className="custom-table-row">
-                  <div className="custom-table-column security-logs">
-                    <div>PDNS Logs</div>
-                  </div>
-                  <div className="custom-table-column entries-container">
-                    {pdnsEntries.map((entry, idx) => (
-                      <div key={idx} className="custom-table-entry">
-                        <div className="attributes-grid">{flattenAttributes(entry)}</div>
-                        <div className="json-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent default link behavior
-                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
-                          }}
-                        >
-                          Full Pull
-                        </a>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* VPN Logs */}
-              {Object.keys(vpnEntries).length > 0 && (
-                <div className="custom-table-row">
-                  <div className="custom-table-column security-logs">
-                    <div>VPN Logs</div>
-                  </div>
-                  <div className="custom-table-column entries-container">
-                    <div className="custom-table-entry">
-                      <div className="attributes-grid">{flattenAttributes(vpnEntries)}</div>
-                        <div className="json-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent default link behavior
-                            alert(JSON.stringify(vpnEntries, null, 2)); // Display JSON in an alert
-                          }}
-                        >
-                          Full Pull
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* CBR Logs */}
-              {Object.keys(cbrEntries).length > 0 && (
-                <div className="custom-table-row">
-                  <div className="custom-table-column security-logs">
-                    <div>CBR Logs</div>
-                  </div>
-                  <div className="custom-table-column entries-container">
-                    <div className="custom-table-entry">
-                      <div className="attributes-grid">{flattenAttributes(cbrEntries)}</div>
-                        <div className="json-link">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault(); // Prevent default link behavior
-                            alert(JSON.stringify(cbrEntries, null, 2)); // Display JSON in an alert
-                          }}
-                        >
-                          Full Pull
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
+      return (
+        <div className="custom-table-row">
+          <div className="custom-table-column security-logs">
+            <div>{title}</div>
+          </div>
+          <div className="custom-table-column entries-container">
+            <div className="custom-table-entry">
+              <div className="attributes-grid">{flattenAttributes(data)}</div>
+              <div className="json-link">
+                <a href="#" onClick={(e) => {
+                  e.preventDefault();
+                  alert(JSON.stringify(data, null, 2));
+                }}>
+                  Full Pull
+                </a>
+              </div>
             </div>
-          );
-        })}
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div className="custom-table">
+      <div className="custom-table-header">
+        <div className="ioc-header-container">
+          <div className="header-pivot-links">
+            <div className="ioc-header-title">{ioc}</div>
+            <div className="pivot-links-box">
+              {generatePivotLinks(ioc)}
+            </div>
+          </div>
+        </div>
+      </div>
+  
+        {renderArraySection('Security Logs', oil)}
+        {renderArraySection('PDNS Logs', pdns)}
+        {renderObjectSection('VPN Logs', vpn)}
+        {renderObjectSection('CBR Logs', cbr)}
+        {renderObjectSection('Asset Data', asset)}
       </div>
     );
   };
