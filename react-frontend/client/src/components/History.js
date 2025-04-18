@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import './History.css'; // Import the stylesheet
 
 function History() {
   const navigate = useNavigate();
+  const location = useLocation(); // Access location state
+  const [darkMode, setDarkMode] = useState(location.state?.darkMode || false); // Default to false if not provided
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,7 +37,7 @@ function History() {
   }, []);
 
   const handleBack = () => {
-    navigate('/dashboard');
+    navigate('/dashboard', { state: { darkMode } });
   };
 
   const handleClearHistory = async () => {
@@ -61,9 +64,9 @@ function History() {
   };
 
   return (
-    <div className="history-container">
+    <div className={`history-container ${darkMode ? 'dark-mode' : ''}`}>
       <header className="history-header">
-        <h1>Search History</h1>
+        <h1 className="h1-text">Search History</h1>
         <div className="header-buttons">
           <button className="back-button" onClick={handleBack}>
             Back to Dashboard
@@ -81,7 +84,7 @@ function History() {
       </header>
       
       <div className="history-content">
-        <h2>Your Recent Searches</h2>
+        <h2 className="h2-text">Your Recent Searches</h2>
         
         {loading && <p>Loading history...</p>}
         {error && <p className="error">Error: {error}</p>}

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { SearchResultsList } from './SearchResultsList';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const [inputText, setInputText] = useState('');
   const [results, setResults] = useState([]);
-  const [darkMode, setDarkMode] = useState(false);
+  const location = useLocation();
+  const [darkMode, setDarkMode] = useState(location.state?.darkMode || false);
   const [fangedDefanged, setFangedDefanged] = useState('defanged');
   const navigate = useNavigate();
 
@@ -21,7 +23,7 @@ const Dashboard = () => {
   };
 
   const handleHistory = () => {
-    navigate('/History');
+    navigate('/History', { state: { darkMode } }); // Pass darkMode as state
   };
 
   const handleSearch = async () => {

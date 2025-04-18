@@ -1,0 +1,204 @@
+/* General Reset */
+:root {
+    --bg-light: #f5f5f5;
+    --bg-dark: #1e1e1e;
+    --text-light: #333;
+    --text-dark: #f5f5f5;
+    --header-gradient-light: linear-gradient(90deg, #0099ff, #00cc99);
+    --header-gradient-dark: #1a1a1a;
+    --card-bg-light: white;
+    --card-bg-dark: #1a1a1a;
+    --border-light: #ccc;
+    --border-dark: #202020;
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg-light);
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  .history-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+    background: var(--bg-light);
+    color: var(--text-light);
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  .history-container.dark-mode {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+  }
+  
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    background: var(--header-gradient-light);
+    padding: 15px 20px;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+  }
+  
+  .history-container.dark-mode .history-header {
+    background: var(--header-gradient-dark);
+    border: 3px solid #353535;
+  }
+
+  .history-container.dark-mode .h1-text {
+    margin: 0;
+    background: -webkit-linear-gradient(45deg, #0099ff, #00cc99);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .history-container.dark-mode .h2-text {
+    margin: 0;
+    background: -webkit-linear-gradient(90deg, #0099ff, #00cc99);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .history-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+  }
+  
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .back-button, .clear-button {
+    background: #ededed;
+    color: rgb(74, 74, 74);
+    border: 2px  #0099ff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  .back-button:hover, .clear-button:hover {
+    background: #dbdbdb
+  }
+
+  .clear-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .history-container.dark-mode .back-button,
+  .history-container.dark-mode .clear-button {
+    background: linear-gradient(90deg, #444, #666);
+    color: #f5f5f5;
+  }
+
+  .history-container.dark-mode .back-button:hover,
+  .history-container.dark-mode .clear-button:hover {
+    background: linear-gradient(90deg, #333, #555);
+  }
+
+  .history-container.dark-mode .clear-button:disabled {
+     background: #555;
+    color: #888;
+    cursor: not-allowed;
+  }
+  
+  .history-content {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--card-bg-light);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background 0.3s;
+  }
+  
+  .history-container.dark-mode .history-content {
+    background: var(--card-bg-dark);
+    border: 3px solid #353535;
+  }
+  
+  .history-content h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    color: inherit;
+  }
+  
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  .history-table thead tr th {
+    background: linear-gradient(0deg, #0099ff, #00cc99);
+  }
+
+  .history-table th {
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    border: 1px solid var(--border-light);
+    background: none;
+  }
+  
+  .history-table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid var(--border-light);
+  }
+  
+  .history-container.dark-mode .history-table th,
+  .history-container.dark-mode .history-table td {
+    border: 2px solid #3f3f3f;
+  }
+  
+  .history-table th {
+    background: var(--header-gradient-light);
+    color: white;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  
+  .history-container.dark-mode .history-table th {
+    background: var(--header-gradient-dark);
+  }
+  
+  .history-table tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  
+  .history-container.dark-mode .history-table tr:nth-child(even) {
+    background: #333;
+  }
+  
+  .history-table tr:hover {
+    background: #e0f7fa;
+  }
+  
+  .history-container.dark-mode .history-table tr:hover {
+    background: #444;
+  }
+  
+  .error {
+    color: red;
+    font-weight: bold;
+  }
+
+  
