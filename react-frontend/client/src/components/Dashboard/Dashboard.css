@@ -139,9 +139,10 @@ body, html {
 .dashboard-layout {
   display: flex;
   flex: 1;
-  background: inherit; /* Crucial - makes it use the container's bg */
+  background: inherit;
   padding: 20px;
-  gap: 20px
+  gap: 20px;
+  min-height: 0; /* Important for flex children to respect overflow */
 }
 
 /* Search Panel */
@@ -183,17 +184,19 @@ body, html {
   display: flex;
   flex-direction: column;
   width: 100%;
+  flex: 1;
+  min-height: 0; /* Allows textarea to scroll */
+  background: inherit;
 }
 
 .search-box textarea {
-  width: 100%;
-  min-height: 200px;
-  height: 60vh;
-  max-height: 800px;
+  flex: 1;
+  min-height: 100px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  resize: vertical;
+  resize: none;
+  overflow-y: auto;
 }
 
 .non-glowing-border {

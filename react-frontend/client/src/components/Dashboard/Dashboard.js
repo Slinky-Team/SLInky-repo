@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { SearchResultsList } from './SearchResultsList';
 import './Dashboard.css';
-
+import { useEffect } from 'react'; 
 const Dashboard = () => {
   const [inputText, setInputText] = useState('');
   const [results, setResults] = useState([]);
@@ -12,6 +12,15 @@ const Dashboard = () => {
   const [fangedDefanged, setFangedDefanged] = useState('defanged');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (darkMode) {
+      document.body.style.background = "var(--bg-dark)";
+      document.documentElement.style.background = "var(--bg-dark)";
+    } else {
+      document.body.style.background = "var(--bg-light)";
+      document.documentElement.style.background = "var(--bg-light)";
+    }
+  }, [darkMode]);
   // Dark mode toggle function
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => !prevMode);
