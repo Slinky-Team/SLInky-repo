@@ -21,20 +21,27 @@ migrate = Migrate(app, db)
 # Explicitly allow the React frontend origin
 CORS(app,supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
 
+# Initialize login 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-with app.app_context():
-    db.create_all()
-        
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+# create the db 
+with app.app_context():
+    db.create_all()
+
+# vars
+IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
+auth = ('user', 'pass')
+OUTPUT_FILE = "output.txt"
+
+# Default route
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
-
 
 # Register route
 @app.route('/api/register', methods=['POST'])
@@ -58,15 +65,10 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
-    
 
     # Retrieve user by username
     username_input = data['username'].strip()  # Ensure no leading/trailing spaces
     user = User.query.filter_by(username=username_input).first()
-
-    # Debug: Print out the user object
-    print(f"Query result for username '{username_input}': {user}")
-    # print(f"CURRENT USER: {user} || USERNAME: {user.username} || PASS: {user.password}")
 
     # Check if the user exists
     if user == None:
@@ -77,7 +79,6 @@ def login():
         return jsonify({"message": "Invalid credentials!"}), 401
 
     # If user is valid, proceed with login
-    print("SUCESSS LOGIN!!!!!")
     login_user(user)
     session.permanent = True  # Ensures session persists across restarts
     return jsonify({"message": "Login successful!", "redirect": "/"}), 200
@@ -155,28 +156,6 @@ def fang_defang():
         print(f"FAILED FANGING API: {e}")
         return "Error processing text", 500
 
-
-OIL_API_URL = "http://127.0.0.1:5000/oil"
-
-@app.route("/oil", methods=["GET"])
-def proxy_oil_request():
-    key = request.args.get('key')
-    print(f"Received request for /oil with key: {key}")  # Debug log
-
-    auth = ('user', 'pass')  # Replace with the actual username and password
-    response = requests.get(f"{OIL_API_URL}?key={key}", headers=request.headers, auth=auth)
-
-    print(f"Response from Count-fakeula API: {response.status_code}, {response.text}")  # Debug log
-
-    # Handle non-JSON responses
-    if response.headers.get('Content-Type') == 'application/json':
-        return jsonify(response.json()), response.status_code
-    else:
-        return jsonify({"error": response.text}), response.status_code
-        
-IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
-auth = ('user', 'pass')
-OUTPUT_FILE = "output.txt"
 
 @app.route("/search-and-extract", methods=["POST"])
 def search_and_extract():
