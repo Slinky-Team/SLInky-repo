@@ -144,21 +144,27 @@ const Dashboard = () => {
       return;
     }
 
+    console.log('Data passed in: ', data);
+
     const iocs = Object.keys(data[1].data);
     let iocData = {};
 
-    for (let i=0; i<iocs.length; i++) {
-      let currIocData = data[1].data[iocs[i]];
 
-      console.log(currIocData);
+    for (let i=0; i<iocs.length; i++) {
+
+      let currIocData = data[1].data[iocs[i]];
 
       if (!iocData[iocs[i]]) {
         iocData[iocs[i]] = [];
       }
 
       for (let j=0; j<Object.entries(currIocData).length; j++) {
+
+        if (!currIocData[j].data?.data || Object.entries(currIocData[j].data.data) === 0) {
+          break; // Skip is there is no data
+        }
+
         let entry = currIocData[j].data.data; // Get all iocs enpoints entries
-        // console.log(entry);
 
 
         // Obtain data source (oil, cbr, pdns.. etc.)
@@ -173,7 +179,6 @@ const Dashboard = () => {
 
       }
     }
-    
     // ===== CSV Export Begins Here =====
     let rows = [];
 
