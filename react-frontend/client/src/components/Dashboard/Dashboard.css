@@ -274,7 +274,6 @@ body, html {
   background: #009966;
 }
 
-/* Results Section */
 .results-section {
   flex: 1;
   display: flex;
@@ -282,7 +281,6 @@ body, html {
   gap: 20px;
 }
 
-/* Lookup Container */
 .lookup-container {
   background: white;
   padding: 20px;
@@ -293,25 +291,24 @@ body, html {
   
 }
 
-/* Lookup Header */
 .lookup-header {
   display: flex;
-  justify-content: center; /* Center the title horizontally */
+  justify-content: center;
   align-items: center;
   padding: 10px;
   background: linear-gradient(90deg, #0099ff, #00cc99);
-  border-radius: 5px 5px 0 0; /* Rounded corners at the top */
-  border: 1px solid #ccc; /* Border around the header */
-  margin-bottom: 10px; /* Space between header and results */
-  position: relative; /* Ensure the button is positioned relative to this container */
+  border-radius: 5px 5px 0 0;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  position: relative;
 }
 
 .lookup-title {
-  font-size: 1.5em; /* Larger font size */
+  font-size: 1.5em;
   font-weight: bold;
-  margin: 0; /* Remove default margin */
-  color: #ffffff; /* Dark text color */
-  text-align: center; /* Center the text */
+  margin: 0;
+  color: #ffffff;
+  text-align: center;
 }
 
 .lookup-header .export-button {
@@ -319,26 +316,25 @@ body, html {
   color: white;
   border:#444;
   border-radius: 5px;
-  padding: 6px 12px; /* Smaller padding */
+  padding: 6px 12px;
   cursor: pointer;
-  font-size: 0.8em; /* Smaller font size */
+  font-size: 0.8em;
   border-radius: 5px;
   transition: background 0.3s;
-  position: absolute; /* Position the button absolutely */
-  right: 20px; /* Move the button to the right */
+  position: absolute;
+  right: 20px;
 }
 
 .lookup-header .export-button:hover {
   background: #009966;
 }
 
-/* Results Box */
 .results-box {
-  min-height: 200px; /* Prevent collapse */
+  min-height: 200px;
   background: var(--card-bg-light);
   transition: background 0.3s;
 }
-/* Link-style navigation */
+
 .header-links {
   display: flex;
   align-items: center;
@@ -361,12 +357,10 @@ body, html {
   text-decoration: underline;
 }
 
-/* Dark mode text colors */
 .dark-mode .nav-link {
   color: #f5f5f5;
 }
 
-/* Keep your original dark mode header gradient */
 .dashboard-header {
   background: linear-gradient(90deg, #0099ff, #00cc99);
 }
