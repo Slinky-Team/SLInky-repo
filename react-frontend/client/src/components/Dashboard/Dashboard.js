@@ -62,57 +62,35 @@ const Dashboard = () => {
       console.log('Raw data from /search-and-extract:', data);
 
       // Update the results with the oil processing output
-      setResults(prevResults => [
-        ...prevResults,
-        {
-          id: Date.now().toString(),
-          query: inputText.trim(),
-          timestamp: new Date().toISOString(),
-          data: data || [], // Ensure `data` is an array
-          status: 'Completed',
+      const searchResult = {
+        id: Date.now().toString(),
+        query: inputText.trim(),
+        timestamp: new Date().toISOString(),
+        data: data || [],
+        status: 'Completed',
+      };
+  
+      setResults((prevResults) => [...prevResults, searchResult]);  
+  
+      const saveResponse = await fetch('/api/search-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      ]);
+        body: JSON.stringify({
+          query: searchResult.query,
+          status: searchResult.status,
+          data: searchResult.data,
+        }),
+        credentials: 'include',
+      });
   
-      // // Step 2: Extract keys from the response
-      // const processedKeys = data.data?.map(item => item.threat?.indicator?.description); // Extract the "description" field as the key
-      // console.log('Extracted keys:', processedKeys);
+      if (!saveResponse.ok) {
+        throw new Error(`Failed to save search history: ${await saveResponse.text()}`);
+      }
   
-      // // Ensure the keys are unique
-      // const uniqueKeys = [...new Set(processedKeys)];
-  
-      // if (uniqueKeys.length === 0) {
-      //   console.error('No valid keys to send to oil.py');
-      //   return;
-      // }
-  
-      // // Step 3: Call the oil function for each key
-      // for (const key of uniqueKeys) {
-      //   console.log(`Sending request to /oil with key: ${encodeURIComponent(key)}`);
-      //   const oilResponse = await fetch(`/oil?key=${encodeURIComponent(key)}`, {
-      //     method: 'GET',
-      //     headers: { 'Content-Type': 'application/json' },
-      //     credentials: 'include',
-      //   });
-  
-      //   if (!oilResponse.ok) {
-      //     console.error(`Oil API returned ${oilResponse.status}: ${await oilResponse.text()}`);
-      //   } else {
-      //     const oilResult = await oilResponse.json();
-      //     console.log(`Oil processing result for key ${key}:`, oilResult);
-  
-      //     // Update the results with the oil processing output
-      //     setResults(prevResults => [
-      //       ...prevResults,
-      //       {
-      //         id: Date.now().toString(),
-      //         query: inputText.trim(),
-      //         timestamp: new Date().toISOString(),
-      //         data: oilResult.data || [], // Ensure `data` is an array
-      //         status: 'Completed',
-      //       },
-      //     ]);
-      //   }
-      // }
+      console.log('Search history saved successfully');
+
     } catch (error) {
       console.error('Search error:', error);
       setResults([
