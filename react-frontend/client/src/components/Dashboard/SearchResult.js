@@ -116,6 +116,7 @@ export const SearchResult = ({ result, darkMode }) => {
         hour12: true,
       });
     };
+
     const flattenAttributes = (entry) => {
       // List of attributes to exclude
       const excludedAttributes = ['callerIpAddress', 'client', 'megaoil'];
@@ -295,7 +296,104 @@ export const SearchResult = ({ result, darkMode }) => {
           prioritizedAttributes[6] = ['source', entry.oil.charAt(0).toUpperCase() + entry.oil.slice(1)];
         }
       }
-    
+
+      //PDNS endpoint attributes
+      if (entry.count) {
+        prioritizedAttributes[1] = ['count', entry.count]
+      }
+
+      if (entry.data) {
+        prioritizedAttributes[0] = ['count', entry.data]
+      }
+
+      if (entry.event) {
+        prioritizedAttributes[2] = ['startdate', formatForDate(entry.event.start)];
+        prioritizedAttributes[3] = ['starttime', formatForTime(entry.event.start)];
+        prioritizedAttributes[6] = ['enddate', formatForDate(entry.event.end)];
+        prioritizedAttributes[7] = ['endtime', formatForTime(entry.event.end)];
+      }
+
+      if (entry.name) {
+        prioritizedAttributes[4] = ['count', entry.name]
+      }
+
+      if (entry.type) {
+        prioritizedAttributes[5] = ['count', entry.type]
+      }
+
+      //VPN endpoint attributes
+      if (entry.as) {
+        if (entry.as.number) {
+          prioritizedAttributes[4] = ['number', entry.as.number]
+        }
+
+        if (entry.as.organization.name) {
+          prioritizedAttributes[3] = ['orgName', entry.as.organization.name]
+        }
+      }
+
+      if (entry.geo) {
+        if(entry.geo.city_name) {
+          prioritizedAttributes[5] = ['city', entry.geo.city_name]
+        }
+
+        if(entry.geo.country_iso_code) {
+          prioritizedAttributes[7] = ['countryIso', entry.geo.country_iso_code]
+        }
+
+        if(entry.geo.region_name) {
+          prioritizedAttributes[6] = ['region', entry.geo.region_name]
+        }
+      }
+      
+      if (entry.host) {
+        if(entry.host.ip?.[0]) {
+          prioritizedAttributes[0] = ['hostIp', entry.host.ip[0]]
+        }
+      }
+
+      if (entry.network) {
+        if(entry.network.application) {
+          prioritizedAttributes[1] = ['application', entry.network.application]
+        }
+
+        if(entry.network.name) {
+          prioritizedAttributes[2] = ['applicationName', entry.network.name]
+        }
+      }
+
+      //CBR endpoint attributes
+      if (entry?.process?.host) {
+        if (entry.process.host.ip[0]) {
+          prioritizedAttributes[0] = ['hostIp', entry.process.host.ip[0]]
+        }
+
+        if (entry.process.host.name) {
+          prioritizedAttributes[1] = ['hostName', entry.process.host.name]
+        }
+
+        if (entry.process.host.type) {
+          prioritizedAttributes[2] = ['hostType', entry.process.host.type]
+        }
+
+        if (entry.process.host.os.family) {
+          prioritizedAttributes[3] = ['hostOs', entry.process.host.os.family]
+        }
+      }
+
+      if (entry?.process?.pid) {
+        prioritizedAttributes[4] = ['pid', entry.process.pid]
+      }
+
+      if (entry?.process?.hash?.md5) {
+        prioritizedAttributes[5] = ['pid', entry.process.hash.md5]
+      }
+
+      if (entry?.process?.start) {
+        prioritizedAttributes[6] = ['startdate', formatForDate(entry.process.start)];
+        prioritizedAttributes[7] = ['starttime', formatForTime(entry.process.start)];
+      }
+
       // adds remaining attributes, just in case anything is missed
       const remainingAttributes = attributes.filter(
         ([key]) => !prioritizedAttributes.some(([pKey]) => pKey === key)
@@ -305,7 +403,11 @@ export const SearchResult = ({ result, darkMode }) => {
       let finalAttributes = [...prioritizedAttributes];
       remainingAttributes.forEach(([key, value]) => {
         if (finalAttributes.length < 8) {
-          finalAttributes.push([key, value]);
+          if (/^\d+$/.test(key)) { // Check is key being pushed is a digit (This represents a json key:val object that we don't want printing)
+            finalAttributes.push(['-', '']); // If it is then replace is with 'blank' placeholder
+          } else {
+            finalAttributes.push([key, value]);
+          }
         }
       });
     
@@ -330,13 +432,30 @@ export const SearchResult = ({ result, darkMode }) => {
     return (
       <div className={`custom-table-container ${darkMode ? 'dark-mode' : ''}`}>
         {keys.map((ioc) => {
-          const entries = data[ioc]?.oil;
-          if (!entries || entries.length === 0) return null;
-  
+          const oilEntries = data[ioc]?.oil;
+          if (!oilEntries || oilEntries.length === 0) return null;
+
+          const pdnsEntries = data[ioc]?.pdns;
+          if (!pdnsEntries || pdnsEntries.length === 0) return null;
+
+          const vpnEntries = data[ioc]?.vpn;
+          if (!vpnEntries || vpnEntries.length === 0) return null;
+
+          const cbrEntries = data[ioc]?.cbr;
+          if (!cbrEntries || cbrEntries.length === 0) return null;
+
+          console.log('VPN entries: ', cbrEntries);
+          // console.log('VPN entries: ', vpnEntries.length);
+          
+          let netflowEntries = [];
+          let otherEntries = [];
+
           // separate entries if they're netflow
-          const netflowEntries = entries.filter((entry) => entry.oil === 'netflow');
-          const otherEntries = entries.filter((entry) => entry.oil !== 'netflow');
-  
+          if (oilEntries !== null && Array.isArray(oilEntries)) {
+            netflowEntries = oilEntries.filter((entry) => entry.oil === 'netflow');
+            otherEntries = oilEntries.filter((entry) => entry.oil !== 'netflow');
+          }
+
           return (
             <div key={ioc} className="custom-table">
               <div className="custom-table-header">
@@ -349,8 +468,9 @@ export const SearchResult = ({ result, darkMode }) => {
                 </div>
   
                 {/* right column: not-netflow entries */}
+                {/* Oil Logs */}
                 <div className="custom-table-column entries-container">
-                  {otherEntries.map((entry, idx) => (
+                  {(otherEntries || []).map((entry, idx) => (
                     <div key={idx} className="custom-table-entry">
                       <div className="attributes-grid">{flattenAttributes(entry)}</div>
                       <div className="json-link">
@@ -369,6 +489,7 @@ export const SearchResult = ({ result, darkMode }) => {
                 </div>
               </div>
 
+              {/* Netflow Logs*/}
               {netflowEntries.length > 0 && (
                 <div className="custom-table-row">
                   <div className="custom-table-column security-logs">
@@ -394,6 +515,84 @@ export const SearchResult = ({ result, darkMode }) => {
                   </div>
                 </div>
               )}
+
+              {/* PDNS Logs */}
+              {pdnsEntries.length > 0 && (
+                <div className="custom-table-row">
+                  <div className="custom-table-column security-logs">
+                    <div>PDNS Logs</div>
+                  </div>
+                  <div className="custom-table-column entries-container">
+                    {pdnsEntries.map((entry, idx) => (
+                      <div key={idx} className="custom-table-entry">
+                        <div className="attributes-grid">{flattenAttributes(entry)}</div>
+                        <div className="json-link">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent default link behavior
+                            alert(JSON.stringify(entry, null, 2)); // Display JSON in an alert
+                          }}
+                        >
+                          Full Pull
+                        </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* VPN Logs */}
+              {Object.keys(vpnEntries).length > 0 && (
+                <div className="custom-table-row">
+                  <div className="custom-table-column security-logs">
+                    <div>VPN Logs</div>
+                  </div>
+                  <div className="custom-table-column entries-container">
+                    <div className="custom-table-entry">
+                      <div className="attributes-grid">{flattenAttributes(vpnEntries)}</div>
+                        <div className="json-link">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent default link behavior
+                            alert(JSON.stringify(vpnEntries, null, 2)); // Display JSON in an alert
+                          }}
+                        >
+                          Full Pull
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* CBR Logs */}
+              {Object.keys(cbrEntries).length > 0 && (
+                <div className="custom-table-row">
+                  <div className="custom-table-column security-logs">
+                    <div>CBR Logs</div>
+                  </div>
+                  <div className="custom-table-column entries-container">
+                    <div className="custom-table-entry">
+                      <div className="attributes-grid">{flattenAttributes(cbrEntries)}</div>
+                        <div className="json-link">
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevent default link behavior
+                            alert(JSON.stringify(cbrEntries, null, 2)); // Display JSON in an alert
+                          }}
+                        >
+                          Full Pull
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           );
         })}
