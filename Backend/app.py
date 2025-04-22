@@ -34,7 +34,7 @@ with app.app_context():
     db.create_all()
 
 # vars
-IOC_EXTRACTOR_URL = "http://127.0.0.1:5000/extract"
+IOC_EXTRACTOR_URL = "http://127.0.0.1:7001/extract"
 auth = ('user', 'pass')
 OUTPUT_FILE = "output.txt"
 
@@ -228,7 +228,7 @@ def check_iocs_against_endpoints(ioc_map):
         results[ioc_value] = []  # Prepare a list to hold responses
         ioc_type = details["type"]
 
-        BASE_URL = "http://127.0.0.1:5000"
+        BASE_URL = "http://127.0.0.1:7001"
 
         # Determine endpoints based on the IOC type
         if ioc_type in ("ipv4-addr", "ipv6-addr"):
